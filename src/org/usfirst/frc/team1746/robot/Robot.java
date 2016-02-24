@@ -41,7 +41,8 @@ public class Robot extends IterativeRobot {
 	AnalogInput defenseSelector;
 	AnalogInput slotSelector;
 	DigitalInput goalSelector;
-	DigitalInput rampDetector;
+	DigitalInput rampDetectorLeft;
+	DigitalInput rampDetectorRight;
 	Timer delayTime;
 	Timer intakeDelay;
 	Gyro gyro;
@@ -83,7 +84,7 @@ public class Robot extends IterativeRobot {
 	double SPD_D_ROCKWALL = .5;
 	double SPD_D_ROUGH_TERRAIN = .5;
 	double SPD_SPYBOT = .5;
-	double SPD_BACKUP = .25;
+	double SPD_BACKUP = -0.25;
 	double SPD_CALIBRATE = .25;
 	
 	double CALIBRATE_ANGLE = 10;
@@ -127,8 +128,8 @@ public class Robot extends IterativeRobot {
     	
     	beambreak = new DigitalInput(6);
     	goalSelector = new DigitalInput(7);
-    	rampDetector = new DigitalInput(8);
-    	
+    	rampDetectorLeft = new DigitalInput(8);
+    	rampDetectorRight = new DigitalInput(9);
     	defenseSelector = new AnalogInput(2);
     	slotSelector = new AnalogInput(3);
     	
@@ -440,8 +441,9 @@ public class Robot extends IterativeRobot {
     					
     				break;
     			case BACKUP:
-    				myRobot.setLeftRightMotorOutputs(SPD_BACKUP, -SPD_BACKUP);
-    				if(!rampDetector.get()){
+    				//myRobot.setLeftRightMotorOutputs(SPD_BACKUP, SPD_BACKUP);
+    				drivePID(SPD_BACKUP, 0);
+    				if(!rampDetectorLeft.get() && !rampDetectorRight.get()){
     					autonState = AutonStates.APPROACH_TOWER;
     					//Add failsafe code later
     				}
@@ -567,7 +569,8 @@ public class Robot extends IterativeRobot {
 		//Ball Indicator
 		SmartDashboard.putBoolean("Ball Indicator", !beambreak.get());
 		//Ramp Detector
-		SmartDashboard.putBoolean("Ramp Detector", !rampDetector.get());
+		SmartDashboard.putBoolean("Ramp Detector Left", !rampDetectorLeft.get());
+		SmartDashboard.putBoolean("Ramp Detector Right", !rampDetectorRight.get());
 		//Auton Selections
 		SmartDashboard.putString("Selected Goal", selectedGoal.name());
 		SmartDashboard.putString("Selected Slot", selectedSlot.name());
