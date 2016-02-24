@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 	
+	Preferences prefs;
 	Auton_Slot_1 Auton_Slot_1;
 	Auton_Slot_2 Auton_Slot_2;
 	Auton_Slot_3 Auton_Slot_3;
@@ -41,8 +43,14 @@ public class Robot extends IterativeRobot {
 	DigitalInput goalSelector;
 	DigitalInput rampDetector;
 	Timer delayTime;
+	Timer intakeDelay;
 	Gyro gyro;
 	Relay ballIndicator;
+	
+	
+	
+	
+	
 	
     //////////////////////////////////////////////////////////////
     //////////////           Constants            ////////////////
@@ -50,18 +58,19 @@ public class Robot extends IterativeRobot {
 	
 	double WHEELDIAMETER  = 6;
 	double WHEEL_CIRCUMFRENCE = 3.14*WHEELDIAMETER;
+	double ENCODER_GEAR_RATIO = 1.714; 
 	
-	double DIST_APPROACH          = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_LOWBAR            = 16*12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_A_PORTCULLIS      = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_A_CHEVAL_DE_FRISE = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_B_RAMPARTS        = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_B_MOAT            = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_C_DRAWBRIDGE      = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_C_SALLYPORT       = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_D_ROCKWALL        = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_D_ROUGH_TERRAIN   = 12/WHEEL_CIRCUMFRENCE*100;
-	double DIST_SPYBOT            = 12/WHEEL_CIRCUMFRENCE*100;
+	double DIST_APPROACH          = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_LOWBAR            = 17.5*12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_A_PORTCULLIS      = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_A_CHEVAL_DE_FRISE = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_B_RAMPARTS        = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_B_MOAT            = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_C_DRAWBRIDGE      = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_C_SALLYPORT       = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_D_ROCKWALL        = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_D_ROUGH_TERRAIN   = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_SPYBOT            = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	
 	double SPD_APPROACH = .5;
 	double SPD_LOWBAR = .5;
@@ -78,6 +87,11 @@ public class Robot extends IterativeRobot {
 	double SPD_CALIBRATE = .25;
 	
 	double CALIBRATE_ANGLE = 10;
+	
+	double PID_P = 0.01;
+	double PID_I = 0.01;
+	double MOTOR_INCREMENT_RATE = .02;
+	double leftMotorSpeed;
 	
     //////////////////////////////////////////////////////////////
     //////////////          Robot Init            ////////////////
@@ -98,7 +112,7 @@ public class Robot extends IterativeRobot {
     	Auton_Slot_4.init();
     	Auton_Slot_5.init();
     	
-    	myRobot = new RobotDrive(3, 2, 1, 0);    	
+    	myRobot = new RobotDrive(3, 2, 1, 0);
     	
     	xbox = new Joystick(0);
     	
@@ -128,9 +142,12 @@ public class Robot extends IterativeRobot {
         server.startAutomaticCapture("cam0");
         
         delayTime = new Timer();
+        intakeDelay = new Timer();
         
-        autonState = AutonStates.DELAY;
-        calibrateState = CalibrateStates.INIT;
+        initrobot();
+        
+        selectedDefense = Defense.NONE;
+        
         putSmartDashboard();
 	
     }
@@ -147,30 +164,39 @@ public class Robot extends IterativeRobot {
         ////////////////////////////////////////
         ///////           Drive          ///////
         ////////////////////////////////////////
-        //myRobot.arcadeDrive(xbox);
-        myRobot.arcadeDrive(xbox, true);
+    	myRobot.arcadeDrive(xbox, true);
+        if(xbox.getRawButton(3)){
+        	drivePID(.4, 0);
+        } else if(xbox.getRawButton(4)){
+        	drivePID(.4, 17.5*12);        	 
+        }
+       
         
         ////////////////////////////////////////
         ///////            Arm           ///////
         ////////////////////////////////////////
-        if(xbox.getRawButton(6)){
-        	armControl0.set(true);
-        	armControl1.set(false);
-        } else if(xbox.getRawButton(5)){
-        	armControl0.set(false);
-        	armControl1.set(true);
-        }
+        armControl0.set(xbox.getRawButton(6));
+        armControl1.set(xbox.getRawButton(5));
         
         ////////////////////////////////////////
-        ///////          Intake          ///////
+        ///////      Intake/Outake       ///////
         ////////////////////////////////////////
-        if(xbox.getRawButton(1) && beambreak.get()){
-       	 intake.set(1);
-        }else if(xbox.getRawButton(2)){
-        	intake.set(-1);
-        } else{
-        	intake.set(0);
-        }
+       if(!beambreak.get()){
+    	   intakeDelay.start();
+    	   if(intakeDelay.get() > 10){
+    		   intake.set(0);
+    	   }
+       } else{
+    	   if(xbox.getRawButton(1)){
+    		   intake.set(1);
+    		   intakeDelay.reset();
+    		   intakeDelay.stop();
+    	   } else if(xbox.getRawButton(2)){
+    		   intake.set(-1);
+    	   } else{
+    		   intake.set(0);
+    	   }
+       }
         ////////////////////////////////////////
         ///////      Ball Indicator      ///////
         ////////////////////////////////////////
@@ -318,16 +344,16 @@ public class Robot extends IterativeRobot {
     	
     	case APPROACH:
     		encoderSetPoint = DIST_APPROACH;
-    		myRobot.setLeftRightMotorOutputs(-SPD_APPROACH, SPD_APPROACH);
+    		drivePID(SPD_APPROACH, 0);
     		if( leftEncoder.get() > encoderSetPoint){
     			autonState = AutonStates.WAIT4TELEOP;
     		}
     		break;
     	case APP_LOWBAR:
     		encoderSetPoint = DIST_LOWBAR;
-    		myRobot.setLeftRightMotorOutputs(-SPD_LOWBAR, SPD_LOWBAR);
+    		drivePID(SPD_LOWBAR, 0);
     		if( leftEncoder.get() > encoderSetPoint){
-    			autonState = AutonStates.CALIBRATE;
+    			autonState = AutonStates.WAIT4TELEOP;
     		}
     		break;
     	case APP_A_PORTCULLIS:
@@ -474,42 +500,19 @@ public class Robot extends IterativeRobot {
         updateSmartDashboard();
     }
 	
-	
-	public void setDefenseSelector(){
-		if(defenseSelector.getValue() >= 0 && defenseSelector.getValue() < 365){
-			selectedDefense = Defense.NONE;
-		}
-		if(defenseSelector.getValue() >= 365 && defenseSelector.getValue() < 728){
-			selectedDefense = Defense.APPROACH_ONLY;
-		}
-		if(defenseSelector.getValue() >= 728 && defenseSelector.getValue() < 1091){
-			selectedDefense = Defense.LOWBAR;
-		}
-		if(defenseSelector.getValue() >= 1091 && defenseSelector.getValue() < 1454){
-			selectedDefense = Defense.A_PORTCULLIS;
-		}
-		if(defenseSelector.getValue() >= 1454 && defenseSelector.getValue() < 1817){
-			selectedDefense = Defense.A_CHEVAL_DE_FRISE;
-		}
-		if(defenseSelector.getValue() >= 1817 && defenseSelector.getValue() < 2181){
-			selectedDefense = Defense.B_RAMPARTS;
-		}
-		if(defenseSelector.getValue() >= 2181 && defenseSelector.getValue() < 2545){
-			selectedDefense = Defense.B_MOAT;
-		}
-		if(defenseSelector.getValue() >= 2545 && defenseSelector.getValue() < 2909){
-			selectedDefense = Defense.C_DRAWBRIDGE;
-		}
-		if(defenseSelector.getValue() >= 2909 && defenseSelector.getValue() < 3273){
-			selectedDefense = Defense.C_SALLY_PORT;
-		}
-		if(defenseSelector.getValue() >= 3273 && defenseSelector.getValue() < 3635){
-			selectedDefense = Defense.D_ROCK_WALL;
-		}
-		if(defenseSelector.getValue() >= 3635 && defenseSelector.getValue() < 3999){
-			selectedDefense = Defense.D_ROUGH_TERRAIN;
+	public void newDefenseSelector(){
+		for(Defense defense1 : Defense.values()){
+			if(SmartDashboard.getBoolean(defense1.name()) && selectedDefense != defense1){
+				selectedDefense = defense1;
+				for(Defense defense2 : Defense.values()){
+					if(defense2 != defense1){
+						SmartDashboard.putBoolean(defense2.name(), false);
+					}
+				}	
+			}
 		}
 	}
+	
 	public void setSlotSelector(){
 		if(SmartDashboard.getBoolean("Slot 1") && selectedSlot != Slot.SLOT_1){
 			selectedSlot = Slot.SLOT_1;
@@ -557,14 +560,12 @@ public class Robot extends IterativeRobot {
 //////////////        Smart Dashboard         ////////////////
 //////////////////////////////////////////////////////////////
 	public void updateSmartDashboard(){
+		SmartDashboard.putNumber("Left Motor Speed", leftMotorSpeed);
+		SmartDashboard.putNumber("Intake Timer", intakeDelay.get());
 		//Slot Selector
 		
-		
-		
-		
-		
 		//Ball Indicator
-		SmartDashboard.putBoolean("Ball Indicator", beambreak.get());
+		SmartDashboard.putBoolean("Ball Indicator", !beambreak.get());
 		//Ramp Detector
 		SmartDashboard.putBoolean("Ramp Detector", !rampDetector.get());
 		//Auton Selections
@@ -576,6 +577,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putString("Auton Slot State", getSelectedAutonSlotStateName());
 		//Left Encoder Values
 		SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
+		SmartDashboard.putNumber("Right Encoder", rightEncoder.get());
+		SmartDashboard.putNumber("Encoder Error", leftEncoder.get() - rightEncoder.get());
 		SmartDashboard.putNumber("Encoder Set Point", (int)encoderSetPoint );
 		SmartDashboard.putString("Calibrate State", calibrateState.name());
 		SmartDashboard.putNumber("Gyro", gyro.getAngle());
@@ -602,6 +605,7 @@ public class Robot extends IterativeRobot {
 	
 	
 	public void putSmartDashboard(){
+		SmartDashboard.putBoolean("Reset", false);
 		SmartDashboard.putBoolean("Calibrate", false);
 		SmartDashboard.putNumber("Delay", 0);
 		SmartDashboard.putBoolean("Ball Indicator Light", false);
@@ -615,30 +619,86 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("Right Goal", false);
 		SmartDashboard.putBoolean("Left Goal", false);
 		//Defense Selector
-		SmartDashboard.putBoolean("None", false);
-		SmartDashboard.putBoolean("Spy Bot", false);
-		SmartDashboard.putBoolean("Approach Only", false);
-		SmartDashboard.putBoolean("Low Bar", false);
-		SmartDashboard.putBoolean("A Portcullis", false);
-		SmartDashboard.putBoolean("A Cheval De Frise", false);
-		SmartDashboard.putBoolean("B Ramparts", false);
-		SmartDashboard.putBoolean("B Moat", false);
-		SmartDashboard.putBoolean("C Drawbridge", false);
-		SmartDashboard.putBoolean("C Sally Port", false);
-		SmartDashboard.putBoolean("D Rock Wall", false);
-		SmartDashboard.putBoolean("D Rough Terrain", false);	
+		for(Defense defense : Defense.values()){
+			SmartDashboard.putBoolean(defense.name(), false);
+		}
+		//PID_P
+		SmartDashboard.putNumber("PID P", PID_P);
+		SmartDashboard.putNumber("PID I", PID_I);
 	}
-
+	//////////////////////////////////////////////////////////////
+	//////////////		    	PID              ////////////////
+	/////////////////////////////////////////////////////////////	
+	
+	int sumEncoderErrors;
+	
+	public void drivePID(double desiredLeftMotorSpeed, double turnRadius){
+		double P = SmartDashboard.getNumber("PID P");
+		//double I = SmartDashboard.getNumber("PID I");
+		double encoderError;
+		if(turnRadius != 0){
+		    encoderError = leftEncoder.get() - rightEncoder.get()*(1-(turnRadius-11)/(turnRadius+11));
+		} else{
+			encoderError = leftEncoder.get() - rightEncoder.get();
+		}
+		double rightMotorSpeed;
+		if(leftMotorSpeed < desiredLeftMotorSpeed){
+			leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
+		}else if(leftMotorSpeed > desiredLeftMotorSpeed){
+			leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
+		}else{
+			leftMotorSpeed = desiredLeftMotorSpeed;
+		}
+		rightMotorSpeed = leftMotorSpeed + P*encoderError;
+		myRobot.setLeftRightMotorOutputs(-leftMotorSpeed, -rightMotorSpeed);
+	}
+	
+	
+	public void reversePID(double desiredLeftMotorSpeed, double turnRadius){
+		double P = SmartDashboard.getNumber("PID P");
+		//double I = SmartDashboard.getNumber("PID I");
+		double encoderError;
+		if(turnRadius != 0){
+		    encoderError = leftEncoder.get() - rightEncoder.get()*(1+(turnRadius-11)/(turnRadius+11));
+		} else{
+			encoderError = leftEncoder.get() - rightEncoder.get();
+		}
+		
+		double rightMotorSpeed;
+		if(leftMotorSpeed < desiredLeftMotorSpeed){
+			leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
+		}else if(leftMotorSpeed > desiredLeftMotorSpeed){
+			leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
+		}else{
+			leftMotorSpeed = desiredLeftMotorSpeed;
+		}
+		rightMotorSpeed = leftMotorSpeed + P*encoderError;
+		myRobot.setLeftRightMotorOutputs(+leftMotorSpeed, +rightMotorSpeed);
+	}
+	public void initrobot(){
+		autonState = AutonStates.DELAY;
+        calibrateState = CalibrateStates.INIT;
+        leftEncoder.reset();
+        rightEncoder.reset();
+        leftMotorSpeed = .25;
+	}
+	
+	
+	
 //////////////////////////////////////////////////////////////
 //////////////            Disable             ////////////////
 //////////////////////////////////////////////////////////////
 	public void disabledPeriodic(){
-		setDefenseSelector();
+		newDefenseSelector();
     	setGoalSelector();
     	setSlotSelector();
     	if(SmartDashboard.getBoolean("Calibrate")){
     		gyro.calibrate();
     		SmartDashboard.putBoolean("Calibrate", false);
+    	}
+    	if(SmartDashboard.getBoolean("Reset")){
+    		initrobot();
+    		SmartDashboard.putBoolean("Reset", false);
     	}
     	updateSmartDashboard();
     }
