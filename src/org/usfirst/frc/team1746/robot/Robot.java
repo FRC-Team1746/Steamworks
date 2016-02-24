@@ -696,7 +696,7 @@ public class Robot extends IterativeRobot {
     		gyro.calibrate();
     		SmartDashboard.putBoolean("Calibrate", false);
     	}
-    	//
+    	
     	if(SmartDashboard.getBoolean("Reset")){
     		initrobot();
     		SmartDashboard.putBoolean("Reset", false);
