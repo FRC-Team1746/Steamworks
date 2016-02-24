@@ -43,6 +43,7 @@ public class Robot extends IterativeRobot {
 	DigitalInput goalSelector;
 	DigitalInput rampDetectorLeft;
 	DigitalInput rampDetectorRight;
+	DigitalInput pneumaticSensor;
 	Timer delayTime;
 	Timer intakeDelay;
 	Gyro gyro;
@@ -126,10 +127,13 @@ public class Robot extends IterativeRobot {
     			
     	intake = new Talon(6);
     	
+    	pneumaticSensor = new DigitalInput(5);
     	beambreak = new DigitalInput(6);
     	goalSelector = new DigitalInput(7);
     	rampDetectorLeft = new DigitalInput(8);
     	rampDetectorRight = new DigitalInput(9);
+    	
+    	
     	defenseSelector = new AnalogInput(2);
     	slotSelector = new AnalogInput(3);
     	
@@ -514,7 +518,7 @@ public class Robot extends IterativeRobot {
 			}
 		}
 	}
-	
+	  
 	public void setSlotSelector(){
 		if(SmartDashboard.getBoolean("Slot 1") && selectedSlot != Slot.SLOT_1){
 			selectedSlot = Slot.SLOT_1;
@@ -571,6 +575,8 @@ public class Robot extends IterativeRobot {
 		//Ramp Detector
 		SmartDashboard.putBoolean("Ramp Detector Left", !rampDetectorLeft.get());
 		SmartDashboard.putBoolean("Ramp Detector Right", !rampDetectorRight.get());
+		//Pneumatic Sensor
+		SmartDashboard.putBoolean("Pneumatic Sensor", pneumaticSensor.get());
 		//Auton Selections
 		SmartDashboard.putString("Selected Goal", selectedGoal.name());
 		SmartDashboard.putString("Selected Slot", selectedSlot.name());
@@ -612,6 +618,9 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("Calibrate", false);
 		SmartDashboard.putNumber("Delay", 0);
 		SmartDashboard.putBoolean("Ball Indicator Light", false);
+		//Ramp Detect
+		SmartDashboard.putBoolean("Ramp Detector Left", false);
+		SmartDashboard.putBoolean("Ramp Detector Right", false);
 		//Slot Selector
 		SmartDashboard.putBoolean("Slot 1", false);
 		SmartDashboard.putBoolean("Slot 2", false);
