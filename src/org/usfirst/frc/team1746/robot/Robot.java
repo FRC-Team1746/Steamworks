@@ -63,7 +63,7 @@ public class Robot extends IterativeRobot {
 	double ENCODER_GEAR_RATIO = 1.714; 
 	
 	double DIST_APPROACH          = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
-	double DIST_LOWBAR            = 17.5*12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_LOWBAR            = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_A_PORTCULLIS      = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_A_CHEVAL_DE_FRISE = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_B_RAMPARTS        = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
@@ -85,7 +85,7 @@ public class Robot extends IterativeRobot {
 	double SPD_D_ROCKWALL = .5;
 	double SPD_D_ROUGH_TERRAIN = .5;
 	double SPD_SPYBOT = .5;
-	double SPD_BACKUP = -0.25;
+	double SPD_BACKUP = 0.25;
 	double SPD_CALIBRATE = .25;
 	
 	double CALIBRATE_ANGLE = 10;
@@ -173,7 +173,7 @@ public class Robot extends IterativeRobot {
         if(xbox.getRawButton(3)){
         	drivePID(.4, 0);
         } else if(xbox.getRawButton(4)){
-        	drivePID(.4, 17.5*12);        	 
+        	drivePID(.4, 170);        	 
         }
        
         
@@ -358,8 +358,10 @@ public class Robot extends IterativeRobot {
     		encoderSetPoint = DIST_LOWBAR;
     		drivePID(SPD_LOWBAR, 0);
     		if( leftEncoder.get() > encoderSetPoint){
-    			autonState = AutonStates.WAIT4TELEOP;
+    			
+    			autonState = AutonStates.APPROACH_TOWER;
     		}
+    		
     		break;
     	case APP_A_PORTCULLIS:
     		encoderSetPoint = DIST_A_PORTCULLIS;
@@ -461,7 +463,7 @@ public class Robot extends IterativeRobot {
     				break;
     			case SLOT_1:
     				if(Auton_Slot_1.stateMachine()){
-    					autonState = AutonStates.SHOOT;
+    					autonState = AutonStates.WAIT4TELEOP;
     				}
     				break;
     			case SLOT_2:
@@ -649,7 +651,7 @@ public class Robot extends IterativeRobot {
 		//double I = SmartDashboard.getNumber("PID I");
 		double encoderError;
 		if(turnRadius != 0){
-		    encoderError = leftEncoder.get() - rightEncoder.get()*(1-(turnRadius-11)/(turnRadius+11));
+		    encoderError = leftEncoder.get() - rightEncoder.get() - (leftEncoder.get() * (1-(turnRadius-11)/(turnRadius+11)));
 		} else{
 			encoderError = leftEncoder.get() - rightEncoder.get();
 		}
@@ -663,7 +665,7 @@ public class Robot extends IterativeRobot {
 		}
 		rightMotorSpeed = leftMotorSpeed + P*encoderError;
 		myRobot.setLeftRightMotorOutputs(-leftMotorSpeed, -rightMotorSpeed);
-	}
+	}	
 	
 	
 	public void reversePID(double desiredLeftMotorSpeed, double turnRadius){

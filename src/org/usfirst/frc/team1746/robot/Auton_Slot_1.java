@@ -12,11 +12,14 @@ public class Auton_Slot_1 {
 	}
 	
 	double WHEELDIAMETER  = 6;
+	double ENCODER_GEAR_RATIO = 1.714;
 	double WHEEL_CIRCUMFRENCE = 3.14*WHEELDIAMETER;
 	
-	double DEFENSE_TO_TURN = 137/WHEEL_CIRCUMFRENCE*100; //137 inches
+	double DEFENSE_TO_TURN = 170/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO; //137 inches
 	double TURN_TO_TOWER = 11/WHEEL_CIRCUMFRENCE*100; //60 degrees
 	double DRIVE_TO_TOWER = 100/WHEEL_CIRCUMFRENCE*100; //100 inches
+	
+	double TURN_RADIUS = 170;
 	
 	public void init(){
 		slotToTowerStates = SlotToTowerStates.INIT;
@@ -47,12 +50,14 @@ public class Auton_Slot_1 {
 			break;
 		case LEAVE_DEFENSE:
 			robot.encoderSetPoint = DEFENSE_TO_TURN;
-			robot.myRobot.setLeftRightMotorOutputs(-robot.SPD_LOWBAR, robot.SPD_LOWBAR);
+			//robot.myRobot.setLeftRightMotorOutputs(-robot.SPD_LOWBAR, robot.SPD_LOWBAR);
+			robot.drivePID(.5, TURN_RADIUS);
 			if(robot.leftEncoder.get() >= robot.encoderSetPoint) {
 				robot.myRobot.stopMotor();
 				robot.leftEncoder.reset();
 				robot.rightEncoder.reset();
-				slotToTowerStates = SlotToTowerStates.TURN;
+				//slotToTowerStates = SlotToTowerStates.TURN;
+				return true;
 			}
 			break;
 		case TURN:
