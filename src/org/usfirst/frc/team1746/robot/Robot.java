@@ -74,6 +74,8 @@ public class Robot extends IterativeRobot {
 	double DIST_D_ROUGH_TERRAIN   = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_SPYBOT            = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	
+	double DIST_RETREAT_LOWBAR    = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+
 	double SPD_APPROACH = .5;
 	double SPD_LOWBAR = .5;
 	double SPD_A_PORTCULLIS = .5;
@@ -94,6 +96,9 @@ public class Robot extends IterativeRobot {
 	double PID_I = 0.01;
 	double MOTOR_INCREMENT_RATE = .02;
 	double leftMotorSpeed;
+	
+	Boolean armLowered;
+	int autonArmCounter;
 	
     //////////////////////////////////////////////////////////////
     //////////////          Robot Init            ////////////////
@@ -154,6 +159,10 @@ public class Robot extends IterativeRobot {
         selectedDefense = Defense.NONE;
         
         putSmartDashboard();
+        
+        
+        Boolean armLowered = false;
+		int AutonArmCounter = 0;
 	
     }
     
@@ -180,8 +189,8 @@ public class Robot extends IterativeRobot {
         ////////////////////////////////////////
         ///////            Arm           ///////
         ////////////////////////////////////////
-        armControl0.set(xbox.getRawButton(6));
-        armControl1.set(xbox.getRawButton(5));
+        armControl0.set(xbox.getRawButton(6)); //Up
+        armControl1.set(xbox.getRawButton(5)); // Down
         
         ////////////////////////////////////////
         ///////      Intake/Outake       ///////
@@ -286,7 +295,19 @@ public class Robot extends IterativeRobot {
 		RETREAT,
 		UNBREACH,
 		REALIGN,
-		WAIT4TELEOP
+		WAIT4TELEOP,
+		RETREAT_LOWBAR,
+		RETREAT_A_PORTCULLIS,
+		RETREAT_A_CHEVAL_DE_FRISE,
+		RETREAT_B_RAMPARTS,
+		RETREAT_B_MOAT,
+		RETREAT_C_DRAWBRIDGE,
+		RETREAT_C_SALLY_PORT,
+		RETREAT_D_ROCK_WALL,
+		RETREAT_D_ROUGH_TERRAIN,
+		RETREAT_SPYBOT,
+		LOWER_ARM_TO_FLOOR,
+		LOWER_ARM_TO_SENSOR
 	};
 	
 	public enum CalibrateStates {
@@ -303,6 +324,8 @@ public class Robot extends IterativeRobot {
 		
 		delayTime.reset();
 		delayTime.start();
+		Boolean armLowered = false;
+		int AutonArmCounter = 0;
     }
     
     AutonStates autonState;
@@ -318,8 +341,8 @@ public class Robot extends IterativeRobot {
     	case INIT:
     		leftEncoder.reset();
 			rightEncoder.reset();
-			
-    		if(selectedDefense == Defense.NONE){
+			autonState = AutonStates.LOWER_ARM_TO_FLOOR;
+    		/*if(selectedDefense == Defense.NONE){
     			autonState = AutonStates.WAIT4TELEOP;
     		}else if(selectedDefense == Defense.APPROACH_ONLY) {
     			autonState = AutonStates.APPROACH;
@@ -343,10 +366,40 @@ public class Robot extends IterativeRobot {
     			autonState = AutonStates.APP_D_ROUGH_TERRAIN;
     		}else if(selectedDefense == Defense.SPYBOT) {
     			autonState = AutonStates.APP_SPYBOT;
+    		}*/
+    	break;
+    	
+    	case LOWER_ARM_TO_FLOOR:
+    		
+    		if(!pneumaticSensor.get()){
+    			armLowered = true;    			
+    		}
+    		if(armLowered){
+    			autonArmCounter++;
+    			if(autonArmCounter > 75){
+    				armControl1.set(false);
+    			}
+    		} else{
+    			armControl1.set(true);
     		}
     		break;
-    		
-    	
+    	case LOWER_ARM_TO_SENSOR:
+    		armControl1.set(true);
+    		if(!pneumaticSensor.get()){
+    			armControl1.set(false);
+    			int i = 0;
+    			autonState = AutonStates.APP_LOWBAR;
+    			/*for(AutonStates nextState : AutonStates.values()){
+    				i++;
+    				if(selectedDefense.name() == "APP_" + nextState.name()){
+    					autonState = AutonStates.valueOf("APP_" + selectedDefense.name());
+    				}
+    				if(i > AutonStates.values().length){
+    					autonState = AutonStates.WAIT4TELEOP;
+    				}
+    			}*/
+    		}
+    		break;
     	case APPROACH:
     		encoderSetPoint = DIST_APPROACH;
     		drivePID(SPD_APPROACH, 0);
@@ -356,10 +409,15 @@ public class Robot extends IterativeRobot {
     		break;
     	case APP_LOWBAR:
     		encoderSetPoint = DIST_LOWBAR;
-    		drivePID(SPD_LOWBAR, 0);
-    		if( leftEncoder.get() > encoderSetPoint){
-    			
-    			autonState = AutonStates.APPROACH_TOWER;
+    		if(leftEncoder.get() <= encoderSetPoint){
+    			drivePID(SPD_LOWBAR, 0);
+    		} else {
+    			drivePID(0,0);
+    			if(leftMotorSpeed < MOTOR_INCREMENT_RATE){
+    				leftEncoder.reset();
+        			rightEncoder.reset();
+        			autonState = AutonStates.RETREAT_LOWBAR;
+    			}
     		}
     		
     		break;
@@ -426,6 +484,16 @@ public class Robot extends IterativeRobot {
     			autonState = AutonStates.CALIBRATE;
     		}
     		break;
+    		
+    	case RETREAT_LOWBAR: 
+    		encoderSetPoint = -DIST_RETREAT_LOWBAR;
+    	 drivePID(-SPD_LOWBAR, 0);
+    		if( leftEncoder.get() < encoderSetPoint){
+    			reversePID(0,0);
+    			autonState = AutonStates.WAIT4TELEOP;
+    		}
+    		break;
+    		
     	case CALIBRATE:
     		switch (calibrateState) {
     			case INIT: 
@@ -656,13 +724,24 @@ public class Robot extends IterativeRobot {
 			encoderError = leftEncoder.get() - rightEncoder.get();
 		}
 		double rightMotorSpeed;
-		if(leftMotorSpeed < desiredLeftMotorSpeed){
-			leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
-		}else if(leftMotorSpeed > desiredLeftMotorSpeed){
-			leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
-		}else{
-			leftMotorSpeed = desiredLeftMotorSpeed;
+		if(desiredLeftMotorSpeed >= 0){
+			if(leftMotorSpeed < desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
+			}else if(leftMotorSpeed > desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
+			}else{
+				leftMotorSpeed = desiredLeftMotorSpeed;
+			}
+		} else{
+			if(leftMotorSpeed > desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
+			}else if(leftMotorSpeed < desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
+			}else{
+				leftMotorSpeed = desiredLeftMotorSpeed;
+			}
 		}
+		
 		rightMotorSpeed = leftMotorSpeed + P*encoderError;
 		myRobot.setLeftRightMotorOutputs(-leftMotorSpeed, -rightMotorSpeed);
 	}	
@@ -673,22 +752,26 @@ public class Robot extends IterativeRobot {
 		//double I = SmartDashboard.getNumber("PID I");
 		double encoderError;
 		if(turnRadius != 0){
-		    encoderError = leftEncoder.get() - rightEncoder.get()*(1+(turnRadius-11)/(turnRadius+11));
+		    encoderError = leftEncoder.get() - rightEncoder.get() - (leftEncoder.get() * (1-(turnRadius-11)/(turnRadius+11)));
 		} else{
 			encoderError = leftEncoder.get() - rightEncoder.get();
 		}
-		
 		double rightMotorSpeed;
-		if(leftMotorSpeed < desiredLeftMotorSpeed){
-			leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
-		}else if(leftMotorSpeed > desiredLeftMotorSpeed){
-			leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
-		}else{
-			leftMotorSpeed = desiredLeftMotorSpeed;
+		//.25  = last told left motor speed
+		//.25 = desired
+		if(desiredLeftMotorSpeed > 0){
+			if(leftMotorSpeed > desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
+			}else if(leftMotorSpeed < desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
+			}else{
+				leftMotorSpeed = desiredLeftMotorSpeed;
+			}
 		}
-		rightMotorSpeed = leftMotorSpeed + P*encoderError;
-		myRobot.setLeftRightMotorOutputs(+leftMotorSpeed, +rightMotorSpeed);
+		rightMotorSpeed = leftMotorSpeed - P*encoderError;
+		myRobot.setLeftRightMotorOutputs(leftMotorSpeed, rightMotorSpeed);
 	}
+	
 	public void initrobot(){
 		autonState = AutonStates.DELAY;
         calibrateState = CalibrateStates.INIT;
