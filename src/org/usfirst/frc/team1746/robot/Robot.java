@@ -63,10 +63,10 @@ public class Robot extends IterativeRobot {
 	double ENCODER_GEAR_RATIO = 1.714; 
 	
 	double DIST_APPROACH          = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
-	double DIST_LOWBAR            = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_LOWBAR            = 150/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_A_PORTCULLIS      = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_A_CHEVAL_DE_FRISE = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
-	double DIST_B_RAMPARTS        = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_B_RAMPARTS        = 200/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_B_MOAT            = 200/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_C_DRAWBRIDGE      = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_C_SALLYPORT       = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
@@ -77,10 +77,10 @@ public class Robot extends IterativeRobot {
 	double DIST_RETREAT_LOWBAR    = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 
 	double SPD_APPROACH = .5;
-	double SPD_LOWBAR = .5;
+	double SPD_LOWBAR = .4;
 	double SPD_A_PORTCULLIS = .5;
 	double SPD_A_CHEVAL_DE_FRISE = .5;
-	double SPD_B_RAMPARTS = .7;
+	double SPD_B_RAMPARTS = .8;
 	double SPD_B_MOAT = .75;
 	double SPD_C_DRAWBRIDGE = .5;
 	double SPD_C_SALLYPORT = .5;
@@ -462,7 +462,7 @@ public class Robot extends IterativeRobot {
     		break;
     	case APP_B_RAMPARTS:
     		encoderSetPoint = DIST_B_RAMPARTS;
-    		drivePID(SPD_B_RAMPARTS, 0);
+    		drivePID(SPD_B_RAMPARTS, 170);
     		if( leftEncoder.get() > encoderSetPoint){
     			autonState = AutonStates.WAIT4TELEOP;
     		}
