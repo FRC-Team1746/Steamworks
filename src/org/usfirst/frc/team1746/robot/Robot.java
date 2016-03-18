@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,7 +35,7 @@ public class Robot extends IterativeRobot {
 	Solenoid armControl0;
 	Solenoid armControl1;
 	Talon intake;
-	Victor tapeMeasure;
+	VictorSP scalingWinch;
 	DigitalInput beambreak;
 	CameraServer server;
 	Encoder leftEncoder;
@@ -98,7 +99,7 @@ public class Robot extends IterativeRobot {
 	double leftMotorSpeed;
 	
 	Boolean armLowered;
-	int autonLoopCounter = 0;
+	int loopCounter = 0;
 	
     //////////////////////////////////////////////////////////////
     //////////////          Robot Init            ////////////////
@@ -128,7 +129,7 @@ public class Robot extends IterativeRobot {
     	
     	ballIndicator = new Relay(0);
 
-    	tapeMeasure = new Victor(5);
+    	scalingWinch = new VictorSP(5);
     			
     	intake = new Talon(6);
     	
@@ -156,9 +157,11 @@ public class Robot extends IterativeRobot {
         initrobot();
         
         selectedDefense = Defense.NONE;
+        selectedSlot = Slot.NONE;
+        selectedGoal = Goal.LOW_LEFT;
         
         armLowered = false;
-		int autonLoopCounter = 0;
+		int loopCounter = 0;
         
         putSmartDashboard();
 	
@@ -182,31 +185,36 @@ public class Robot extends IterativeRobot {
         ////////////////////////////////////////
         ///////            Arm           ///////
         ////////////////////////////////////////
-        armControl0.set(xbox.getRawButton(6)); // Up
-        armControl1.set(xbox.getRawButton(5)); // Down
+        if(xbox.getRawButton(1)){
+        	armControl("up");
+        } else if(xbox.getRawButton(2)){
+        	armControl("down");
+        } else{
+        	armControl("off");
+        }
         
         ////////////////////////////////////////
         ///////      Intake/Outake       ///////
         ////////////////////////////////////////
        if(xbox.getRawButton(1)){
     	   intake.set(1);
-    	   autonLoopCounter = 0;
+    	   loopCounter = 0;
        } else if(xbox.getRawButton(2)){
-    	   autonLoopCounter = 0;
+    	   loopCounter = 0;
     	   intake.set(-1);
        } else if(xbox.getRawButton(3)){
     	   intake.set(0);
        }
        
        if(!beambreak.get()){
-    	   autonLoopCounter++;
-    	   if(intake.get() == 1 && autonLoopCounter > 10){
+    	   loopCounter++;
+    	   if(intake.get() == 1 && loopCounter > 10){
     		   intake.set(0);
     	   }
        }   
        if(intake.get() == -1 && beambreak.get()){
-    	   autonLoopCounter++;
-    	   if(autonLoopCounter > 20){
+    	   loopCounter++;
+    	   if(loopCounter > 20){
         	   intake.set(0);
     	   }   
        }
@@ -221,11 +229,11 @@ public class Robot extends IterativeRobot {
         
       // Tape Measure Motor
        if(xbox.getPOV(0) == 0){
-    	   tapeMeasure.set(1); 
+    	   scalingWinch.set(1); 
        }else if(xbox.getPOV(0) == 180){
-    	   tapeMeasure.set(-1);
+    	   scalingWinch.set(-1);
        }else{
-    	   tapeMeasure.set(0);
+    	   scalingWinch.set(0);
        }
        updateSmartDashboard();
     }
@@ -399,9 +407,9 @@ public class Robot extends IterativeRobot {
     		}
     		
     		if(armLowered){
-    			autonLoopCounter++;
-    			if(autonLoopCounter > 75){
-    				autonLoopCounter = 0;
+    			loopCounter++;
+    			if(loopCounter > 75){
+    				loopCounter = 0;
     				armControl1.set(false);
     				autonState = DefenseToAutonState.get(selectedDefense);
     			}
@@ -413,7 +421,7 @@ public class Robot extends IterativeRobot {
     		armControl1.set(true);
     		if(!pneumaticSensor.get()){
     			armControl1.set(false);
-    			autonLoopCounter = 0;
+    			loopCounter = 0;
     			autonState = DefenseToAutonState.get(selectedDefense);
     			
     		}
@@ -504,8 +512,8 @@ public class Robot extends IterativeRobot {
     		break;
     	case RELEASE_BALL:
     		intake.set(-1);
-    		autonLoopCounter++;
-    		if(autonLoopCounter > 50){
+    		loopCounter++;
+    		if(loopCounter > 50){
     			intake.set(0);
     			autonState = AutonStates.RETREAT_LOWBAR;
     		}
@@ -605,7 +613,7 @@ public class Robot extends IterativeRobot {
         updateSmartDashboard();
     }
 	
-	public void newDefenseSelector(){
+	public void new_DefenseSelector(){
 		for(Defense defense1 : Defense.values()){
 			if(SmartDashboard.getBoolean(defense1.name()) && selectedDefense != defense1){
 				selectedDefense = defense1;
@@ -616,48 +624,32 @@ public class Robot extends IterativeRobot {
 				}	
 			}
 		}
+		
+		
+		
 	}
-	  
-	public void setSlotSelector(){
-		if(SmartDashboard.getBoolean("Slot 1") && selectedSlot != Slot.SLOT_1){
-			selectedSlot = Slot.SLOT_1;
-			SmartDashboard.putBoolean("Slot 2", false);
-			SmartDashboard.putBoolean("Slot 3", false);
-			SmartDashboard.putBoolean("Slot 4", false);
-			SmartDashboard.putBoolean("Slot 5", false);
-		}else if(SmartDashboard.getBoolean("Slot 2") && selectedSlot != Slot.SLOT_2){
-			selectedSlot = Slot.SLOT_2;
-			SmartDashboard.putBoolean("Slot 1", false);
-			SmartDashboard.putBoolean("Slot 3", false);
-			SmartDashboard.putBoolean("Slot 4", false);
-			SmartDashboard.putBoolean("Slot 5", false);
-		}else if(SmartDashboard.getBoolean("Slot 3") && selectedSlot != Slot.SLOT_3){
-			selectedSlot = Slot.SLOT_3;
-			SmartDashboard.putBoolean("Slot 1", false);
-			SmartDashboard.putBoolean("Slot 2", false);
-			SmartDashboard.putBoolean("Slot 4", false);
-			SmartDashboard.putBoolean("Slot 5", false);
-		}else if(SmartDashboard.getBoolean("Slot 4") && selectedSlot != Slot.SLOT_4){
-			selectedSlot = Slot.SLOT_4;
-			SmartDashboard.putBoolean("Slot 1", false);
-			SmartDashboard.putBoolean("Slot 2", false);
-			SmartDashboard.putBoolean("Slot 3", false);
-			SmartDashboard.putBoolean("Slot 5", false);
-		}else if(SmartDashboard.getBoolean("Slot 5") && selectedSlot != Slot.SLOT_5){
-			selectedSlot = Slot.SLOT_5;
-			SmartDashboard.putBoolean("Slot 1", false);
-			SmartDashboard.putBoolean("Slot 2", false);
-			SmartDashboard.putBoolean("Slot 3", false);
-			SmartDashboard.putBoolean("Slot 4", false);
-		}else if(!SmartDashboard.getBoolean("Slot 1") && !SmartDashboard.getBoolean("Slot 2") && !SmartDashboard.getBoolean("Slot 3") && !SmartDashboard.getBoolean("Slot 4") && !SmartDashboard.getBoolean("Slot 5")){
-			selectedSlot = Slot.NONE;
+	public void new_SlotSelector(){
+		for(Slot slot1 : Slot.values()){
+			if(SmartDashboard.getBoolean(slot1.name()) && selectedSlot != slot1){
+				selectedSlot = slot1;
+				for(Slot slot2 : Slot.values()){
+					if(slot2 != slot1){
+						SmartDashboard.putBoolean(slot2.name(), false);
+					}
+				}	
+			}
 		}
 	}
 	public void setGoalSelector(){
-		if(goalSelector.get() == true){
-			selectedGoal = Goal.LOW_LEFT;
-		} else{
-			selectedGoal = Goal.LOW_RIGHT;
+		for(Goal goal1 : Goal.values()){
+			if(SmartDashboard.getBoolean(goal1.name()) && selectedGoal != goal1){
+				selectedGoal = goal1;
+				for(Goal goal2 : Goal.values()){
+					if(goal2 != goal1){
+						SmartDashboard.putBoolean(goal2.name(), false);
+					}
+				}	
+			}
 		}
 	}
 	
@@ -665,32 +657,32 @@ public class Robot extends IterativeRobot {
 //////////////        Smart Dashboard         ////////////////
 //////////////////////////////////////////////////////////////
 	public void updateSmartDashboard(){
-		SmartDashboard.putBoolean("Arm Lowered", armLowered);
-		SmartDashboard.putNumber("Auton Loop Counterr", autonLoopCounter);
+		//SmartDashboard.putBoolean("Arm Lowered", armLowered);
+		SmartDashboard.putNumber("Loop Counter", loopCounter);
 		SmartDashboard.putNumber("Left Motor Speed", leftMotorSpeed);
 		//Slot Selector
 		
 		//Ball Indicator
 		SmartDashboard.putBoolean("Ball Indicator", !beambreak.get());
 		//Ramp Detector
-		SmartDashboard.putBoolean("Ramp Detector Left", !rampDetectorLeft.get());
-		SmartDashboard.putBoolean("Ramp Detector Right", !rampDetectorRight.get());
+		//SmartDashboard.putBoolean("Ramp Detector Left", !rampDetectorLeft.get());
+		//SmartDashboard.putBoolean("Ramp Detector Right", !rampDetectorRight.get());
 		//Pneumatic Sensor
-		SmartDashboard.putBoolean("Pneumatic Sensor", pneumaticSensor.get());
+		//SmartDashboard.putBoolean("Pneumatic Sensor", pneumaticSensor.get());
 		//Auton Selections
 		SmartDashboard.putString("Selected Goal", selectedGoal.name());
 		SmartDashboard.putString("Selected Slot", selectedSlot.name());
 		SmartDashboard.putString("Selected Defense", selectedDefense.name());
 		//Current State Machine State
-		SmartDashboard.putString("Auton State", autonState.name());
-		SmartDashboard.putString("Auton Slot State", getSelectedAutonSlotStateName());
+		//SmartDashboard.putString("Auton State", autonState.name());
+		//SmartDashboard.putString("Auton Slot State", getSelectedAutonSlotStateName());
 		//Left Encoder Values
 		SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
 		SmartDashboard.putNumber("Right Encoder", rightEncoder.get());
 		SmartDashboard.putNumber("Encoder Error", leftEncoder.get() - rightEncoder.get());
 		SmartDashboard.putNumber("Encoder Set Point", (int)encoderSetPoint );
-		SmartDashboard.putString("Calibrate State", calibrateState.name());
-		SmartDashboard.putNumber("Gyro", gyro.getAngle());
+		//SmartDashboard.putString("Calibrate State", calibrateState.name());
+		//SmartDashboard.putNumber("Gyro", gyro.getAngle());
 	}
 	public String getSelectedAutonSlotStateName(){
 		if(Auton_Slot_1.getCurrentSlotName() != null){
@@ -717,19 +709,18 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("Reset", false);
 		SmartDashboard.putBoolean("Calibrate", false);
 		SmartDashboard.putNumber("Delay", 0);
-		SmartDashboard.putBoolean("Ball Indicator Light", false);
+		//SmartDashboard.putBoolean("Ball Indicator Light", false);
 		//Ramp Detect
-		SmartDashboard.putBoolean("Ramp Detector Left", false);
-		SmartDashboard.putBoolean("Ramp Detector Right", false);
+		//SmartDashboard.putBoolean("Ramp Detector Left", false);
+		//SmartDashboard.putBoolean("Ramp Detector Right", false);
 		//Slot Selector
-		SmartDashboard.putBoolean("Slot 1", false);
-		SmartDashboard.putBoolean("Slot 2", false);
-		SmartDashboard.putBoolean("Slot 3", false);
-		SmartDashboard.putBoolean("Slot 4", false);
-		SmartDashboard.putBoolean("Slot 5", false);
+		for(Slot slot : Slot.values()){
+			SmartDashboard.putBoolean(slot.name(), false);
+		}
 		//Goal Selector
-		SmartDashboard.putBoolean("Right Goal", false);
-		SmartDashboard.putBoolean("Left Goal", false);
+		for(Goal goal : Goal.values()){
+			SmartDashboard.putBoolean(goal.name(), false);
+		}
 		//Defense Selector
 		for(Defense defense : Defense.values()){
 			SmartDashboard.putBoolean(defense.name(), false);
@@ -785,15 +776,32 @@ public class Robot extends IterativeRobot {
         armLowered = false;
 	}
 	
+	public void armControl(String value){
+		if(value.equalsIgnoreCase("up")){
+			armControl1.set(false);
+			armControl0.set(true);
+		} else if(value.equalsIgnoreCase("down")){
+			armControl0.set(false);
+			armControl1.set(true);
+		} else if(value.equalsIgnoreCase("off")){
+			armControl0.set(false);
+			armControl1.set(false);
+		} else {
+			System.out.println("Arm Control: Invalid Value");
+			System.out.println("Value: " + value.toString());
+		}
+		
+	}
+	
 	
 	
 //////////////////////////////////////////////////////////////
 //////////////            Disable             ////////////////
 //////////////////////////////////////////////////////////////
 	public void disabledPeriodic(){
-		newDefenseSelector();
+		new_DefenseSelector();
     	setGoalSelector();
-    	setSlotSelector();
+    	new_SlotSelector();
     	if(SmartDashboard.getBoolean("Calibrate")){
     		gyro.calibrate();
     		SmartDashboard.putBoolean("Calibrate", false);
