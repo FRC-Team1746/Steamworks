@@ -17,9 +17,9 @@ public class Auton_Slot_1 {
 	
 	double DEFENSE_TO_TURN = 170/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO; //137 inches
 	double TURN_TO_TOWER = 11/WHEEL_CIRCUMFRENCE*100; //60 degrees
-	double DRIVE_TO_TOWER = 100/WHEEL_CIRCUMFRENCE*100; //100 inches
+	double DRIVE_TO_TOWER = 240/WHEEL_CIRCUMFRENCE*100; //100 inches
 	
-	double TURN_RADIUS = 170;
+	double TURN_RADIUS = 240;
 	
 	public void init(){
 		slotToTowerStates = SlotToTowerStates.INIT;
@@ -44,9 +44,10 @@ public class Auton_Slot_1 {
 	public boolean stateMachine(){
 		switch(slotToTowerStates) {
 		case INIT:
+			robot.myRobot.stopMotor();
 			robot.leftEncoder.reset();
 			robot.rightEncoder.reset();
-			slotToTowerStates = SlotToTowerStates.LEAVE_DEFENSE;
+			slotToTowerStates = SlotToTowerStates.TURN;
 			break;
 		case LEAVE_DEFENSE:
 			robot.encoderSetPoint = DEFENSE_TO_TURN;
@@ -61,9 +62,8 @@ public class Auton_Slot_1 {
 			}
 			break;
 		case TURN:
-			robot.encoderSetPoint = TURN_TO_TOWER;
-			robot.myRobot.setLeftRightMotorOutputs(-robot.SPD_LOWBAR, -robot.SPD_LOWBAR); // turn left
-			if(robot.leftEncoder.get() >= robot.encoderSetPoint) {
+			robot.driveRotate("right");
+			if(robot.gyro.getAngle() >= 55){
 				robot.myRobot.stopMotor();
 				robot.leftEncoder.reset();
 				robot.rightEncoder.reset();
@@ -72,7 +72,7 @@ public class Auton_Slot_1 {
 			break;
 		case APPROACH_TOWER:
 			robot.encoderSetPoint = DRIVE_TO_TOWER;
-			robot.myRobot.setLeftRightMotorOutputs(-robot.SPD_LOWBAR, robot.SPD_LOWBAR);
+			robot.drivePID(.5, 0);
 			if(robot.leftEncoder.get() >= DRIVE_TO_TOWER) {
 				robot.myRobot.stopMotor();
 				robot.leftEncoder.reset();

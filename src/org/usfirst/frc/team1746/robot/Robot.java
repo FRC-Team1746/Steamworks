@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Joystick.RumbleType;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -46,6 +47,7 @@ public class Robot extends IterativeRobot {
 	DigitalInput rampDetectorLeft;
 	DigitalInput rampDetectorRight;
 	DigitalInput pneumaticSensor;
+	DigitalInput pneumaticSensor2;
 	Timer delayTime;
 	Gyro gyro;
 	Relay ballIndicator;
@@ -64,7 +66,7 @@ public class Robot extends IterativeRobot {
 	double ENCODER_GEAR_RATIO = 1.714; 
 	
 	double DIST_APPROACH          = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
-	double DIST_LOWBAR            = 150/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_LOWBAR            = 225/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_A_PORTCULLIS      = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_A_CHEVAL_DE_FRISE = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_B_RAMPARTS        = 200/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
@@ -73,7 +75,7 @@ public class Robot extends IterativeRobot {
 	double DIST_C_SALLYPORT       = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_D_ROCKWALL        = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_D_ROUGH_TERRAIN   = 180/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
-	double DIST_SPYBOT            = 50/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_SPYBOT            = 125/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	
 	double DIST_RETREAT_LOWBAR    = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 
@@ -133,7 +135,8 @@ public class Robot extends IterativeRobot {
     			
     	intake = new Talon(6);
     	
-    	pneumaticSensor = new DigitalInput(5);
+    	pneumaticSensor = new DigitalInput(4);
+    	pneumaticSensor2 = new DigitalInput(5); 
     	beambreak = new DigitalInput(6);
     	goalSelector = new DigitalInput(7);
     	rampDetectorLeft = new DigitalInput(8);
@@ -159,9 +162,11 @@ public class Robot extends IterativeRobot {
         selectedDefense = Defense.NONE;
         selectedSlot = Slot.NONE;
         selectedGoal = Goal.LOW_LEFT;
+        selectedAutonPath = AutonPaths.CROSS;
         
         armLowered = false;
 		int loopCounter = 0;
+		prevEncoderCount = 0;
         
         putSmartDashboard();
 	
@@ -185,12 +190,25 @@ public class Robot extends IterativeRobot {
         ////////////////////////////////////////
         ///////            Arm           ///////
         ////////////////////////////////////////
-        if(xbox.getRawButton(1)){
+        if(xbox.getRawButton(6)){
         	armControl("up");
-        } else if(xbox.getRawButton(2)){
+        } else if(xbox.getRawButton(5)){
         	armControl("down");
         } else{
         	armControl("off");
+        }
+        
+        
+        ////////
+        if(xbox.getRawButton(7)){
+        	while (!getArmPosition("floor")){
+        		armControl("down");
+        	}
+        }
+        if(xbox.getRawButton(8)){
+        	while (!getArmPosition("sensor")){
+        		armControl("up");
+        	}
         }
         
         ////////////////////////////////////////
@@ -206,7 +224,7 @@ public class Robot extends IterativeRobot {
     	   intake.set(0);
        }
        
-       if(!beambreak.get()){
+       if(beambreak.get()){
     	   loopCounter++;
     	   if(intake.get() == 1 && loopCounter > 10){
     		   intake.set(0);
@@ -235,6 +253,13 @@ public class Robot extends IterativeRobot {
        }else{
     	   scalingWinch.set(0);
        }
+       ////////////////
+       if(xbox.getRawButton(4)){
+    	   driveRotate("right");
+       }
+       /*if(gyro.getAngle() >= 90){
+    	   myRobot.stopMotor();
+       }*/
        updateSmartDashboard();
     }
     
@@ -251,6 +276,7 @@ public class Robot extends IterativeRobot {
     Defense selectedDefense;
     Slot selectedSlot;
     Goal selectedGoal;
+    AutonPaths selectedAutonPath;
     double encoderSetPoint;
     
     public enum Defense {
@@ -317,6 +343,11 @@ public class Robot extends IterativeRobot {
 		LOWER_ARM_TO_FLOOR,
 		LOWER_ARM_TO_SENSOR
 	};
+	public enum AutonPaths {
+		SCORE,
+		CROSS,
+		RETREAT
+	};
 	
 	public enum CalibrateStates {
 		INIT,
@@ -358,6 +389,8 @@ public class Robot extends IterativeRobot {
     
     AutonStates autonState;
     CalibrateStates calibrateState;
+    double prevEncoderCount;
+    
     
     public void autonomousPeriodic() {
     	switch (autonState) {
@@ -382,7 +415,7 @@ public class Robot extends IterativeRobot {
     		}else if(selectedDefense == Defense.A_CHEVAL_DE_FRISE) {
     			autonState = AutonStates.APP_A_CHEVAL_DE_FRISE;
     		}else if(selectedDefense == Defense.A_PORTCULLIS) {
-    			autonState = AutonStates.LOWER_ARM_TO_FLOOR;
+    			autonState = AutonStates.APP_A_PORTCULLIS;
     		}else if(selectedDefense == Defense.B_MOAT) {
     			autonState = AutonStates.LOWER_ARM_TO_SENSOR;
     		}else if(selectedDefense == Defense.B_RAMPARTS) {
@@ -396,25 +429,16 @@ public class Robot extends IterativeRobot {
     		}else if(selectedDefense == Defense.D_ROUGH_TERRAIN) {
     			autonState = AutonStates.LOWER_ARM_TO_SENSOR;
     		}else if(selectedDefense == Defense.SPYBOT) {
-    			autonState = AutonStates.APP_SPYBOT;
+    			autonState = AutonStates.LOWER_ARM_TO_FLOOR;
     		}
     	break;
     	
     	case LOWER_ARM_TO_FLOOR:
-    		
-    		if(!pneumaticSensor.get()){
-    			armLowered = true;    			
-    		}
-    		
-    		if(armLowered){
-    			loopCounter++;
-    			if(loopCounter > 75){
-    				loopCounter = 0;
-    				armControl1.set(false);
-    				autonState = DefenseToAutonState.get(selectedDefense);
-    			}
-    		} else{
-    			armControl1.set(true);
+    		while (!getArmPosition("floor")){
+    			armControl("down");
+    		} 
+    		if(getArmPosition("floor")){
+    			autonState = DefenseToAutonState.get(selectedDefense);
     		}
     		break;
     	case LOWER_ARM_TO_SENSOR:
@@ -442,16 +466,31 @@ public class Robot extends IterativeRobot {
     			if(leftMotorSpeed < MOTOR_INCREMENT_RATE){
     				leftEncoder.reset();
         			rightEncoder.reset();
-        			autonState = AutonStates.RELEASE_BALL;
+        			autonState = AutonStates.APPROACH_TOWER;
     			}
     		}
     		
     		break;
     	case APP_A_PORTCULLIS:
-    		encoderSetPoint = DIST_A_PORTCULLIS;
-    		drivePID(SPD_A_PORTCULLIS, 0);
-    		if( leftEncoder.get() > encoderSetPoint){
-    			autonState = AutonStates.WAIT4TELEOP;
+    		encoderSetPoint = -DIST_A_PORTCULLIS;
+    		if(leftEncoder.get() > encoderSetPoint){
+    		
+    		drivePID(-SPD_A_PORTCULLIS, 0);
+    		}
+    		if( leftEncoder.get() < encoderSetPoint){
+    				if(encoderSetPoint < encoderSetPoint+encoderSetPoint){
+    					loopCounter+=100;
+        				myRobot.stopMotor();
+        				armControl("down");
+    				}
+    				if(leftEncoder.get() < encoderSetPoint){
+    					armControl("off");
+    					drivePID(-SPD_A_PORTCULLIS, 0);
+    					if( leftEncoder.get() < encoderSetPoint){
+    						myRobot.stopMotor();
+    						autonState = AutonStates.WAIT4TELEOP;
+    					}
+    				}
     		}
     		break;
     	case APP_A_CHEVAL_DE_FRISE:
@@ -507,7 +546,7 @@ public class Robot extends IterativeRobot {
     		encoderSetPoint = DIST_SPYBOT;
     		drivePID(SPD_SPYBOT, 0);
     		if( leftEncoder.get() > encoderSetPoint){
-    			autonState = AutonStates.WAIT4TELEOP;
+    			autonState = AutonStates.RELEASE_BALL;
     		}
     		break;
     	case RELEASE_BALL:
@@ -515,7 +554,7 @@ public class Robot extends IterativeRobot {
     		loopCounter++;
     		if(loopCounter > 50){
     			intake.set(0);
-    			autonState = AutonStates.RETREAT_LOWBAR;
+    			autonState = AutonStates.WAIT4TELEOP;
     		}
     		break;
     	case RETREAT_LOWBAR: 
@@ -568,7 +607,7 @@ public class Robot extends IterativeRobot {
     				break;
     			case SLOT_1:
     				if(Auton_Slot_1.stateMachine()){
-    					autonState = AutonStates.WAIT4TELEOP;
+    					autonState = AutonStates.RELEASE_BALL;
     				}
     				break;
     			case SLOT_2:
@@ -652,6 +691,18 @@ public class Robot extends IterativeRobot {
 			}
 		}
 	}
+	public void setAutonPathSelector(){
+		for(AutonPaths autonPath1 : AutonPaths.values()){
+			if(SmartDashboard.getBoolean(autonPath1.name()) && selectedAutonPath != autonPath1){
+				selectedAutonPath = autonPath1;
+				for(AutonPaths autonPath2 : AutonPaths.values()){
+					if(autonPath2 != autonPath1){
+						SmartDashboard.putBoolean(autonPath2.name(), false);
+					}
+				}	
+			}
+		}
+	}
 	
 //////////////////////////////////////////////////////////////
 //////////////        Smart Dashboard         ////////////////
@@ -668,21 +719,25 @@ public class Robot extends IterativeRobot {
 		//SmartDashboard.putBoolean("Ramp Detector Left", !rampDetectorLeft.get());
 		//SmartDashboard.putBoolean("Ramp Detector Right", !rampDetectorRight.get());
 		//Pneumatic Sensor
-		//SmartDashboard.putBoolean("Pneumatic Sensor", pneumaticSensor.get());
+		SmartDashboard.putBoolean("Pneumatic Sensor", pneumaticSensor.get());
+		SmartDashboard.putBoolean("Pneumatic Sensor2", pneumaticSensor2.get());
 		//Auton Selections
 		SmartDashboard.putString("Selected Goal", selectedGoal.name());
 		SmartDashboard.putString("Selected Slot", selectedSlot.name());
 		SmartDashboard.putString("Selected Defense", selectedDefense.name());
+		SmartDashboard.putString("Selected Auton Path", selectedAutonPath.name());
 		//Current State Machine State
-		//SmartDashboard.putString("Auton State", autonState.name());
-		//SmartDashboard.putString("Auton Slot State", getSelectedAutonSlotStateName());
+		SmartDashboard.putString("Auton State", autonState.name());
+		SmartDashboard.putString("Auton Slot State", getSelectedAutonSlotStateName());
 		//Left Encoder Values
 		SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
 		SmartDashboard.putNumber("Right Encoder", rightEncoder.get());
 		SmartDashboard.putNumber("Encoder Error", leftEncoder.get() - rightEncoder.get());
 		SmartDashboard.putNumber("Encoder Set Point", (int)encoderSetPoint );
-		//SmartDashboard.putString("Calibrate State", calibrateState.name());
-		//SmartDashboard.putNumber("Gyro", gyro.getAngle());
+		SmartDashboard.putString("Calibrate State", calibrateState.name());
+		SmartDashboard.putNumber("Gyro", gyro.getAngle());
+		//
+		
 	}
 	public String getSelectedAutonSlotStateName(){
 		if(Auton_Slot_1.getCurrentSlotName() != null){
@@ -709,11 +764,14 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("Reset", false);
 		SmartDashboard.putBoolean("Calibrate", false);
 		SmartDashboard.putNumber("Delay", 0);
+		SmartDashboard.putString("State", autonState.name());
 		//SmartDashboard.putBoolean("Ball Indicator Light", false);
 		//Ramp Detect
 		//SmartDashboard.putBoolean("Ramp Detector Left", false);
 		//SmartDashboard.putBoolean("Ramp Detector Right", false);
 		//Slot Selector
+		
+		
 		for(Slot slot : Slot.values()){
 			SmartDashboard.putBoolean(slot.name(), false);
 		}
@@ -724,6 +782,9 @@ public class Robot extends IterativeRobot {
 		//Defense Selector
 		for(Defense defense : Defense.values()){
 			SmartDashboard.putBoolean(defense.name(), false);
+		}
+		for(AutonPaths autonPath : AutonPaths.values()){
+			SmartDashboard.putBoolean(autonPath.name(), false);
 		}
 		//PID_P
 		SmartDashboard.putNumber("PID P", PID_P);
@@ -776,6 +837,24 @@ public class Robot extends IterativeRobot {
         armLowered = false;
 	}
 	
+	public boolean getArmPosition(String value){
+		if(value.equalsIgnoreCase("floor")){
+			if(!pneumaticSensor2.get()){
+				return true;
+			} else{
+				return false;
+			}
+		} else if(value.equalsIgnoreCase("sensor")){
+			if(!pneumaticSensor.get()){
+				return true;
+			} else{
+				return false;
+			}
+		} else{
+			return false;
+		}
+	}
+	
 	public void armControl(String value){
 		if(value.equalsIgnoreCase("up")){
 			armControl1.set(false);
@@ -790,7 +869,13 @@ public class Robot extends IterativeRobot {
 			System.out.println("Arm Control: Invalid Value");
 			System.out.println("Value: " + value.toString());
 		}
-		
+	}
+	public void driveRotate(String direction){
+		if(direction.equalsIgnoreCase("left")){		
+			myRobot.setLeftRightMotorOutputs(.5, -.5);
+		} else if(direction.equalsIgnoreCase("right")){
+			myRobot.setLeftRightMotorOutputs(-.5, .5);
+		}
 	}
 	
 	
