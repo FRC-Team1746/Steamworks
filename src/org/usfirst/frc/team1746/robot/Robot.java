@@ -51,6 +51,7 @@ public class Robot extends IterativeRobot {
 	Timer delayTime;
 	Gyro gyro;
 	Relay ballIndicator;
+	Preferences Prefs;
 	
 	
 	
@@ -67,8 +68,9 @@ public class Robot extends IterativeRobot {
 	
 	double DIST_APPROACH          = 12/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_LOWBAR            = 225/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
-	double DIST_A_PORTCULLIS      = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
-	double DIST_A_CHEVAL_DE_FRISE = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_A_PORTCULLIS      = 68/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_A_CHEVAL_DE_FRISE = 52/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	double DIST_A_CHEVAL_DE_FRISE_CROSS = 100/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_B_RAMPARTS        = 200/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_B_MOAT            = 200/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_C_DRAWBRIDGE      = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
@@ -76,13 +78,14 @@ public class Robot extends IterativeRobot {
 	double DIST_D_ROCKWALL        = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_D_ROUGH_TERRAIN   = 180/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 	double DIST_SPYBOT            = 125/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
+	boolean TeSt;
 	
 	double DIST_RETREAT_LOWBAR    = 121/WHEEL_CIRCUMFRENCE*100*ENCODER_GEAR_RATIO;
 
 	double SPD_APPROACH = .5;
 	double SPD_LOWBAR = .4;
-	double SPD_A_PORTCULLIS = .5;
-	double SPD_A_CHEVAL_DE_FRISE = .5;
+	double SPD_A_PORTCULLIS = .4;
+	double SPD_A_CHEVAL_DE_FRISE = .4;
 	double SPD_B_RAMPARTS = .8;
 	double SPD_B_MOAT = .75;
 	double SPD_C_DRAWBRIDGE = .5;
@@ -167,6 +170,8 @@ public class Robot extends IterativeRobot {
         armLowered = false;
 		int loopCounter = 0;
 		prevEncoderCount = 0;
+		
+		TeSt = prefs.getBoolean("test", false);
         
         putSmartDashboard();
 	
@@ -278,6 +283,8 @@ public class Robot extends IterativeRobot {
     Goal selectedGoal;
     AutonPaths selectedAutonPath;
     double encoderSetPoint;
+    double encoderSetPoint2;
+    double encoderSetPoint3;
     
     public enum Defense {
 		NONE,
@@ -322,6 +329,10 @@ public class Robot extends IterativeRobot {
 		APP_D_ROCK_WALL,
 		APP_D_ROUGH_TERRAIN,
 		APP_SPYBOT,
+		CROSS_A_CHEVAL_DE_FRISE,
+		ARM_A_CHEVAL_DE_FRISE,
+		ARM_A_PORTCULLIS,
+		CROSS_A_PORTCULLIS,
 		CALIBRATE,
 		APPROACH_TOWER,
 		RELEASE_BALL,
@@ -478,25 +489,51 @@ public class Robot extends IterativeRobot {
     		drivePID(-SPD_A_PORTCULLIS, 0);
     		}
     		if( leftEncoder.get() < encoderSetPoint){
-    				if(encoderSetPoint < encoderSetPoint+encoderSetPoint){
-    					loopCounter+=100;
-        				myRobot.stopMotor();
-        				armControl("down");
-    				}
-    				if(leftEncoder.get() < encoderSetPoint){
-    					armControl("off");
-    					drivePID(-SPD_A_PORTCULLIS, 0);
-    					if( leftEncoder.get() < encoderSetPoint){
-    						myRobot.stopMotor();
-    						autonState = AutonStates.WAIT4TELEOP;
-    					}
-    				}
+    				autonState = AutonStates.ARM_A_PORTCULLIS;
     		}
+    		break;
+    	case ARM_A_PORTCULLIS:
+    		armControl("down");
+    		drivePID(-.3, 0);
+    		if(getArmPosition("floor")){
+    			armControl("off");
+    			autonState = AutonStates.CROSS_A_PORTCULLIS;
+    		}
+    		break;
+    	case CROSS_A_PORTCULLIS:
+    		encoderSetPoint = -DIST_A_PORTCULLIS*3;
+    		if(leftEncoder.get() > encoderSetPoint){
+    		
+    		drivePID(-SPD_A_PORTCULLIS, 0);
+    		}
+    		if( leftEncoder.get() < encoderSetPoint){
+    			autonState = AutonStates.WAIT4TELEOP;
+    		}
+    		
     		break;
     	case APP_A_CHEVAL_DE_FRISE:
     		encoderSetPoint = DIST_A_CHEVAL_DE_FRISE;
     		drivePID(SPD_A_CHEVAL_DE_FRISE, 0);
-    		if( leftEncoder.get() > encoderSetPoint){
+    		if(leftEncoder.get() > encoderSetPoint){
+    			drivePID(0,0);
+    			leftEncoder.reset();
+    			rightEncoder.reset();
+    			autonState = AutonStates.ARM_A_CHEVAL_DE_FRISE;
+    		}
+    		break;
+    	case ARM_A_CHEVAL_DE_FRISE:
+    		loopCounter++;
+    		armControl("down");
+    		if(loopCounter > 100){
+    			armControl("off");
+    			autonState = AutonStates.CROSS_A_CHEVAL_DE_FRISE;
+    		}
+    		break;
+    	case CROSS_A_CHEVAL_DE_FRISE:
+    		encoderSetPoint = DIST_A_CHEVAL_DE_FRISE_CROSS;
+    		drivePID(SPD_A_CHEVAL_DE_FRISE+.1, 0);
+    		if(leftEncoder.get() > encoderSetPoint){
+    			drivePID(0,0);
     			autonState = AutonStates.WAIT4TELEOP;
     		}
     		break;
@@ -736,6 +773,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Encoder Set Point", (int)encoderSetPoint );
 		SmartDashboard.putString("Calibrate State", calibrateState.name());
 		SmartDashboard.putNumber("Gyro", gyro.getAngle());
+		SmartDashboard.putBoolean("TeSt", TeSt);
 		//
 		
 	}
@@ -886,6 +924,7 @@ public class Robot extends IterativeRobot {
 	public void disabledPeriodic(){
 		new_DefenseSelector();
     	setGoalSelector();
+    	setAutonPathSelector();
     	new_SlotSelector();
     	if(SmartDashboard.getBoolean("Calibrate")){
     		gyro.calibrate();

@@ -42,34 +42,20 @@ public class Auton_Slot_2 {
 	public boolean stateMachine(){
 		switch(slotToTowerStates) {
 		case INIT:
+			robot.myRobot.stopMotor();
 			robot.leftEncoder.reset();
 			robot.rightEncoder.reset();
 			slotToTowerStates = SlotToTowerStates.LEAVE_DEFENSE;
 			break;
 		case LEAVE_DEFENSE:
-			robot.encoderSetPoint = DEFENSE_TO_TURN;
-			robot.myRobot.setLeftRightMotorOutputs(-robot.SPD_LOWBAR, robot.SPD_LOWBAR);
-			if(robot.leftEncoder.get() >= robot.encoderSetPoint) {
-				robot.myRobot.stopMotor();
-				robot.leftEncoder.reset();
-				robot.rightEncoder.reset();
+			robot.drivePID(robot.SPD_A_CHEVAL_DE_FRISE, 0);
+			if(robot.leftEncoder.get() > robot.DIST_A_CHEVAL_DE_FRISE_CROSS){
 				slotToTowerStates = SlotToTowerStates.TURN;
 			}
 			break;
 		case TURN:
-			robot.encoderSetPoint = TURN_TO_TOWER;
-			robot.myRobot.setLeftRightMotorOutputs(-robot.SPD_LOWBAR, -robot.SPD_LOWBAR); // turn left
-			if(robot.leftEncoder.get() >= robot.encoderSetPoint) {
-				robot.myRobot.stopMotor();
-				robot.leftEncoder.reset();
-				robot.rightEncoder.reset();
-				slotToTowerStates = SlotToTowerStates.APPROACH_TOWER;
-			}
-			break;
-		case APPROACH_TOWER:
-			robot.encoderSetPoint = DRIVE_TO_TOWER;
-			robot.myRobot.setLeftRightMotorOutputs(-robot.SPD_LOWBAR, robot.SPD_LOWBAR);
-			if(robot.leftEncoder.get() >= DRIVE_TO_TOWER) {
+			robot.driveRotate("right");
+			if(robot.gyro.getAngle() >= 50){
 				robot.myRobot.stopMotor();
 				robot.leftEncoder.reset();
 				robot.rightEncoder.reset();

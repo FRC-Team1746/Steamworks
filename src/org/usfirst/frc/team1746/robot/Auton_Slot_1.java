@@ -50,16 +50,7 @@ public class Auton_Slot_1 {
 			slotToTowerStates = SlotToTowerStates.TURN;
 			break;
 		case LEAVE_DEFENSE:
-			robot.encoderSetPoint = DEFENSE_TO_TURN;
-			//robot.myRobot.setLeftRightMotorOutputs(-robot.SPD_LOWBAR, robot.SPD_LOWBAR);
-			robot.drivePID(.5, TURN_RADIUS);
-			if(robot.leftEncoder.get() >= robot.encoderSetPoint) {
-				robot.myRobot.stopMotor();
-				robot.leftEncoder.reset();
-				robot.rightEncoder.reset();
-				//slotToTowerStates = SlotToTowerStates.TURN;
-				return true;
-			}
+			
 			break;
 		case TURN:
 			robot.driveRotate("right");
