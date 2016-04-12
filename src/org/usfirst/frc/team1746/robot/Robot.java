@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.CameraServer;
+//import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -42,7 +42,7 @@ public class Robot extends IterativeRobot {
 	Talon intake;
 	VictorSP scalingWinch;
 	DigitalInput beambreak;
-	CameraServer server;
+	//CameraServer server;
 	Encoder leftEncoder;
 	Encoder rightEncoder;
 	AnalogInput defenseSelector;
@@ -161,9 +161,9 @@ public class Robot extends IterativeRobot {
     	
     	gyro = new ADXRS450_Gyro();
     	
-    	server = CameraServer.getInstance();
-        server.setQuality(50);	
-        server.startAutomaticCapture("cam0");
+    	//server = CameraServer.getInstance();
+        //server.setQuality(50);	
+        //server.startAutomaticCapture("cam0");
         
         delayTime = new Timer();
         
