@@ -35,6 +35,10 @@ public class Robot extends IterativeRobot {
 	Joystick xbox;
 	Solenoid armControl0;
 	Solenoid armControl1;
+	Solenoid wedgeControl0;
+	Solenoid wedgeControl1;
+	Solenoid hookReleaseControl0;
+	Solenoid hookReleaseControl1;	
 	Talon intake;
 	VictorSP scalingWinch;
 	DigitalInput beambreak;
@@ -131,10 +135,13 @@ public class Robot extends IterativeRobot {
     	
     	armControl0 = new Solenoid(0);
     	armControl1 = new Solenoid(1);
-    	
+    	wedgeControl0 = new Solenoid(2);
+    	wedgeControl1 = new Solenoid(6);
+    	hookReleaseControl0 = new Solenoid(4);
+    	hookReleaseControl1 = new Solenoid(5);
     	ballIndicator = new Relay(0);
 
-    	scalingWinch = new VictorSP(5);
+    	scalingWinch = new VictorSP(4);
     			
     	intake = new Talon(6);
     	
@@ -170,8 +177,6 @@ public class Robot extends IterativeRobot {
         armLowered = false;
 		int loopCounter = 0;
 		prevEncoderCount = 0;
-		
-		TeSt = prefs.getBoolean("test", false);
         
         putSmartDashboard();
 	
@@ -206,14 +211,13 @@ public class Robot extends IterativeRobot {
         
         ////////
         if(xbox.getRawButton(7)){
-        	while (!getArmPosition("floor")){
-        		armControl("down");
-        	}
+        	hookReleaseControl("out");
         }
         if(xbox.getRawButton(8)){
-        	while (!getArmPosition("sensor")){
-        		armControl("up");
-        	}
+        	hookReleaseControl("in");
+        }
+        if(xbox.getRawButton(9)){
+        	hookReleaseControl("off");
         }
         
         ////////////////////////////////////////
@@ -229,7 +233,7 @@ public class Robot extends IterativeRobot {
     	   intake.set(0);
        }
        
-       if(beambreak.get()){
+       if(!beambreak.get()){
     	   loopCounter++;
     	   if(intake.get() == 1 && loopCounter > 10){
     		   intake.set(0);
@@ -406,7 +410,9 @@ public class Robot extends IterativeRobot {
     public void autonomousPeriodic() {
     	switch (autonState) {
     	case DELAY:
+    		wedgeControl("out");
     		if(delayTime.get() >= SmartDashboard.getNumber("Delay")){
+    			wedgeControl("in");
     			autonState = AutonStates.INIT;
     			
     		}
@@ -456,7 +462,6 @@ public class Robot extends IterativeRobot {
     		armControl1.set(true);
     		if(!pneumaticSensor.get()){
     			armControl1.set(false);
-    			loopCounter = 0;
     			autonState = DefenseToAutonState.get(selectedDefense);
     			
     		}
@@ -740,6 +745,36 @@ public class Robot extends IterativeRobot {
 			}
 		}
 	}
+	public void wedgeControl(String value){
+		if(value.equalsIgnoreCase("out")){
+			wedgeControl0.set(true);
+			wedgeControl1.set(false);
+		} else if(value.equalsIgnoreCase("in")){
+			wedgeControl0.set(false);
+			wedgeControl1.set(true);
+		} else if(value.equalsIgnoreCase("off")){
+			wedgeControl0.set(false);
+			wedgeControl1.set(false);
+		} else {
+			System.out.println("Wedge Control: Invalid Value");
+			System.out.println("Value: " + value.toString());
+		}
+	}
+	public void hookReleaseControl(String value){
+		if(value.equalsIgnoreCase("out")){
+			hookReleaseControl0.set(true);
+			hookReleaseControl1.set(false);
+		} else if(value.equalsIgnoreCase("in")){
+			hookReleaseControl0.set(false);
+			hookReleaseControl1.set(true);
+		} else if(value.equalsIgnoreCase("off")){
+			hookReleaseControl0.set(false);
+			hookReleaseControl1.set(false);
+		} else {
+			System.out.println("Wedge Control: Invalid Value");
+			System.out.println("Value: " + value.toString());
+		}
+	}
 	
 //////////////////////////////////////////////////////////////
 //////////////        Smart Dashboard         ////////////////
@@ -801,7 +836,7 @@ public class Robot extends IterativeRobot {
 	public void putSmartDashboard(){
 		SmartDashboard.putBoolean("Reset", false);
 		SmartDashboard.putBoolean("Calibrate", false);
-		SmartDashboard.putNumber("Delay", 0);
+		SmartDashboard.putNumber("Delay", .5);
 		SmartDashboard.putString("State", autonState.name());
 		//SmartDashboard.putBoolean("Ball Indicator Light", false);
 		//Ramp Detect
