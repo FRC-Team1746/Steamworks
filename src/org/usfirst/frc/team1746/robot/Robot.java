@@ -41,6 +41,7 @@ public class Robot extends IterativeRobot {
 	Solenoid hookReleaseControl1;	
 	Talon intake;
 	VictorSP scalingWinch;
+	//VictorSP scalingWinch2;
 	DigitalInput beambreak;
 	//CameraServer server;
 	Encoder leftEncoder;
@@ -142,7 +143,8 @@ public class Robot extends IterativeRobot {
     	ballIndicator = new Relay(0);
 
     	scalingWinch = new VictorSP(4);
-    			
+    	//scalingWinch2 = new VictorSP(7);
+    	
     	intake = new Talon(6);
     	
     	pneumaticSensor = new DigitalInput(4);
@@ -254,15 +256,17 @@ public class Robot extends IterativeRobot {
         	ballIndicator.set(Relay.Value.kOff);
         }
         
-      // Tape Measure Motor
-       if(xbox.getPOV(0) == 0){
-    	   scalingWinch.set(1); 
-       }else if(xbox.getPOV(0) == 180){
-    	   scalingWinch.set(-1);
-       }else{
-    	   scalingWinch.set(0);
+       /////////////////////////////////////////
+       ///////          Scaling          ///////
+       /////////////////////////////////////////
+       if(xbox.getPOV(0) == 315 || xbox.getPOV(0) == 0 || xbox.getPOV(0) == 45){
+    	   scaleControl("up");
+       }else if(xbox.getPOV(0) == 135 || xbox.getPOV(0) == 180 || xbox.getPOV(0) == 225){
+    	   scaleControl("down");
+       }else {
+    	   scaleControl("off");
        }
-       ////////////////
+       /////////////////////////////////////////
        if(xbox.getRawButton(4)){
     	   driveRotate("right");
        }
@@ -745,6 +749,24 @@ public class Robot extends IterativeRobot {
 			}
 		}
 	}
+	//
+	public void scaleControl(String value){
+		if(value.equalsIgnoreCase("up")){
+			scalingWinch.set(1);
+			//scalingWinch2.set(1);
+		} else if(value.equalsIgnoreCase("down")){
+			scalingWinch.set(-1);
+			//scalingWinch2.set(-1);
+		} else if(value.equalsIgnoreCase("off")){
+			scalingWinch.set(0);
+			//scalingWinch2.set(0);
+		} else{
+			System.out.println("Scaling Control: Invalid Value");
+			System.out.println("Value: " + value.toString());
+		}
+	}
+	
+	//
 	public void wedgeControl(String value){
 		if(value.equalsIgnoreCase("out")){
 			wedgeControl0.set(true);
