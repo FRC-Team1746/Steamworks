@@ -24,39 +24,25 @@ public class Robot extends IterativeRobot {
 	//Controls controls = new Controls();
 	//DriveTrain drive = new DriveTrain();
 	Joystick xbox;
-	//RobotDrive myRobot;
+	RobotDrive myRobot;
 	//Solenoid gear0;
 	//Solenoid gear1;
 	//Victor shooter;
 	//Victor conveyor;
 	//Victor loader;
 	//Victor turret;
-	//Victor scaling;
+	Victor scaling;
 	//Talon carol;
 	
 	Servo pixyAZ;
 	Servo pixyEl;
-	int i = -1;
-	int sumXError = 0;
-	int sumYError = 0;
-	int xAvgError = 0;
-	int yAvgError = 0;
 	
 	//Encoder drive_leftEncoder;
 	//Encoder drive_rightEncoder;
 	//Encoder shooter_wheelEncoder;
 	
 	//Gyro gyro;
-	
 
-	
-	double[] xErrors = new double[64];
-	double[] yErrors = new double[64];
-	
-	
-	
-	
-	
 	@Override
 	public void robotInit() {		
 		
@@ -71,17 +57,14 @@ public class Robot extends IterativeRobot {
 		//carol = new Talon(9);
 		vision.init();
 		//controls.init();
-		//SmartDashboard.putNumber("speed", -1.0);
-		SmartDashboard.putNumber("xBuffer", 0);
-		SmartDashboard.putNumber("yBuffer", 0);
-		pixyAZ = new Servo(0);
-		pixyEl = new Servo(1);
+		pixyAZ = new Servo(9);
+		pixyEl = new Servo(8);
 		
 		//loader = new Victor(5);
 		//conveyor = new Victor(6);
 		//shooter = new Victor(7);
 		//turret = new Victor(8);
-		//scaling = new Victor(9);
+		scaling = new Victor(4);
 	}
 
 	@Override
@@ -99,55 +82,43 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		if(i==63)i=0;
-		else i++;
-		vision.printPixyStuff();
-		//myRobot.arcadeDrive(xbox);
-		
-		double AZ = (xbox.getRawAxis(0)+1)/2;
-		double EL = (xbox.getRawAxis(1)+1)/2;
-		SmartDashboard.putNumber("AZ", AZ);
-		SmartDashboard.putNumber("Elevation", EL);
-		//pixyAZ.set(AZ);
-		//pixyEl.set(EL);
-		
 		//0-.5 left .5-1 right
 		//0-.5 down .5-1 up
-		
-		double x = SmartDashboard.getNumber("xPosition", 150);
-		double y = SmartDashboard.getNumber("yPosition", 100);
-		double xError = x-150; //x+ move right //x- move left
-		double yError = y-100; //y+ move up    //y- move down
-		
-		
-		xErrors[i] = xError;
-		yErrors[i] = yError;
+		if(xbox.getRawButton(6)){
+			
+			System.out.println("xErrors: " + vision.xErrors.toString());
+			System.out.println("yErrors: " + vision.yErrors.toString());
+		}
+		vision.printPixyStuff();
 		
 		
+		if(xbox.getRawButton(1)){
+			pixyAZ.set((xbox.getRawAxis(0)+1)/2);
+			pixyEl.set((xbox.getRawAxis(1)+1)/2);
+		}
 		
 		
+		if(xbox.getRawButton(2))scaling.set(1);
+		else if(xbox.getRawButton(3))scaling.set(-1);
+		else scaling.set(0);
 		
 		
 		double motorXPos = pixyAZ.get();
 		double motorYPos = pixyEl.get();
-		
-		double deltaXRate = .005;
-		double deltaYRate = .004;
-		
+		double deltaXRate = .004;
+		double deltaYRate = .002;
 		
 		
-		double xBuffer = SmartDashboard.getNumber("xBuffer", 0);
-		double yBuffer = SmartDashboard.getNumber("yBuffer", 0);
-		
-		if(xAvgError>xBuffer && x!=0)pixyAZ.set(motorXPos+deltaXRate);
-		if(xAvgError<xBuffer && x!=0)pixyAZ.set(motorXPos-deltaXRate);
-		if(yAvgError>yBuffer && y!=0)pixyEl.set(motorYPos+deltaYRate);
-		if(yAvgError<yBuffer && y!=0)pixyEl.set(motorYPos-deltaYRate);
-		
-		SmartDashboard.putNumber("xError", xError);
-		SmartDashboard.putNumber("yError", yError);
-		
-		
+		if(xbox.getRawButton(3)){
+			if(vision.getAvgXError(8)>12)pixyAZ.set(motorXPos+deltaXRate);
+			if(vision.getAvgXError(8)<-12)pixyAZ.set(motorXPos-deltaXRate);
+			if(vision.getAvgYError(8)>0)pixyEl.set(motorYPos+deltaYRate);
+			if(vision.getAvgYError(8)<-15)pixyEl.set(motorYPos-deltaYRate);
+		}
+		if(xbox.getRawButton(4)){
+			pixyAZ.set(.5);
+			pixyEl.set(.5);
+		}
 		
 		//controls.teleopDrive();
 		/*if(xbox.getRawButton(1)){
@@ -168,24 +139,6 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 		
 	} 
-	
-	
-	public double getErrorAvg(String axis){
-		int sum = 0;
-		if(axis.equalsIgnoreCase("x")){
-			for(double xError : xErrors){
-				sum += xError;
-			}
-		}
-		if(axis.equalsIgnoreCase("y")){
-			for(double yError : yErrors){
-				sum += yError;
-			}
-		}
-		return sum/64;
-		
-		
-	}
 }
 
 
