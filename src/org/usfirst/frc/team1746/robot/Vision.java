@@ -2,10 +2,7 @@ package org.usfirst.frc.team1746.robot;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Vision {
 	I2C pixyCam;
@@ -20,6 +17,12 @@ public class Vision {
 	int width = -1;
 	int height = -1;
 	
+	boolean foundBothTargets = true;
+	boolean checkSumAValid = true;
+	boolean checkSumBValid = true;
+	boolean sigAValid = true;
+	boolean sigBValid = true;
+	
     public void init() {
     	pixyCam = new I2C(I2C.Port.kOnboard, 0x54);
     }
@@ -31,32 +34,55 @@ public class Vision {
     	
 
     	pixyCam.readOnly(pixyValues, 64);
-    	if (pixyValues != null) {
-    		int i = 0;
-    		while (!(pixyValues[i] == 85 && pixyValues[i + 1] == -86) && i < 50) {
-    			i++;
-    		}
+    	int i = 0;
+    	
+    	
+    	while (!(pixyValues[i] == 0x55 && pixyValues[i + 1] == 0xAA) && i < 36) {
     		i++;
-    		if (i > 50)
-    			i = 49;
-    		while (!(pixyValues[i] == 85 && pixyValues[i + 1] == -86) && i < 50) {
-    			i++;
-    		}
-    		xPos = (char) (((pixyValues[i + 7] & 0xff) << 8) | (pixyValues[i + 6] & 0xff));
-    		yPos = (char) ((pixyValues[i + 9] & 0xff << 8) | pixyValues[i + 8] & 0xff);
-    		width = (char) ((pixyValues[i + 11] & 0xff << 8) | pixyValues[i + 10] & 0xff);
-    		height = (char) ((pixyValues[i + 13] & 0xff << 8) | pixyValues[i + 12] & 0xff);
-    		SmartDashboard.putNumber("Raw xPos", xPos);
-    		SmartDashboard.putNumber("Raw yPos", yPos);
-    		SmartDashboard.putNumber("Raw width", width);
-    		SmartDashboard.putNumber("Raw height", height);
-    		
-    		
-    		updateErrors(8);
-    		SmartDashboard.putNumber("AvgXError", getAvgXError(8));
-    		SmartDashboard.putNumber("AvgYError", getAvgYError(8));
-    		
+    	}//0-36
+    	
+    	if(i >= 36) return; // Word Not Found    	
+    	
+    	i+=2;//Start of Object
+    	
+    	// verify there are two targets
+    	if(!(pixyValues[i] == 0x55 && pixyValues[i+1] == 0xAA && pixyValues[i+14] == 0x55 && pixyValues[i+15] == 0xAA)) {
+    		foundBothTargets = false;
+    		return; //couldnt find both frames
     	}
+    	
+    	// verify checksum
+    	int checkSumA = 0;
+    	int checkSumB = 0;
+    	for(int j=0; j<5; j+=2){
+    		checkSumA += ((pixyValues[j + 5] << 8) | pixyValues[j + 4]);
+    		checkSumB += ((pixyValues[j + 19] << 8) | pixyValues[j + 18]);
+    	}
+    	if(checkSumA != ((pixyValues[i + 3] << 8) | pixyValues[i + 2])) {
+    		checkSumAValid = false;
+    		return;
+    	}
+    	if(checkSumB != ((pixyValues[i + 17] << 8) | pixyValues[i + 16])) {
+    		checkSumBValid = false;
+    		return;
+    	}
+    	
+    	// verify both are signature 1
+      	if(((pixyValues[i + 5] << 8) | pixyValues[i + 4]) != 1 ) {
+      		sigAValid = false;
+      		return; 
+      	}
+      	if(((pixyValues[i + 19] << 8) | pixyValues[i + 18]) != 1 ) {
+      		sigBValid = false;
+      		return; 
+      	}
+    	
+    	//
+   		xPos = (char) ((pixyValues[i + 7] << 8) | pixyValues[i + 6]);
+   		yPos = (char) ((pixyValues[i + 9] << 8) | pixyValues[i + 8]);
+   		width =     (char) ((pixyValues[i + 11]  << 8) | pixyValues[i + 10]);
+   		height =    (char) ((pixyValues[i + 13] << 8) | pixyValues[i + 12]);
+    		
     }
     public double getRawXError(){
     	return xPos-150; //x+ move right //x- move left
@@ -85,8 +111,5 @@ public class Vision {
     	if(yErrors.size() < range+2) return getRawYError();
     	for(double y : yErrors.subList(yErrors.size()-(range+1), yErrors.size()-1))sum+=y;
     	return sum/range;
-    }
-    public void toLog(){
-    	
     }
 }
