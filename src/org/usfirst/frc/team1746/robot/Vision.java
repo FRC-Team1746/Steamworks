@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1746.robot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import edu.wpi.first.wpilibj.I2C;
 
@@ -9,8 +10,8 @@ public class Vision {
 	byte[] toSend = new byte[32];
 	byte[] rawData = new byte[32];
 	
-	List<Double> xErrors = new ArrayList<Double>();
-	List<Double> yErrors = new ArrayList<Double>();
+	List<Double> xErrors = Arrays.asList(new Double[10]);
+	List<Double> yErrors = Arrays.asList(new Double[10]);
 	
 	int xPos = -1;
 	int yPos = -1;
@@ -23,6 +24,8 @@ public class Vision {
 	boolean sigAValid = true;
 	boolean sigBValid = true;
 	
+	int loops = -1;
+	
     public void init() {
     	pixyCam = new I2C(I2C.Port.kOnboard, 0x54);
     }
@@ -31,8 +34,6 @@ public class Vision {
     	byte[] pixyValues = new byte[64];
     	pixyValues[0] = (byte) 0b01010101;
     	pixyValues[1] = (byte) 0b10101010;
-    	
-
     	pixyCam.readOnly(pixyValues, 64);
     	int i = 0;
     	
@@ -91,25 +92,27 @@ public class Vision {
     	return yPos-100; //y+ move up    //y- move down
     }
     public void updateErrors(int max){
-    	if(xErrors.size() > max*2){
-    		xErrors = xErrors.subList(max-1, (max*2)-1);
-    	}
-    	if(yErrors.size() > max*2){
-    		yErrors = yErrors.subList(max-1, (max*2)-1);
-    	}
-    	if(xPos != 0.0 && xPos < 300 && xPos > -300)xErrors.add(getRawXError());
-    	if(yPos != 0.0 && yPos < 200 && yPos > -200)yErrors.add(getRawYError());
+    	loops++;
+    	if(loops>9) loops = 0;
+    	xErrors.set(loops, getRawXError());
+    	yErrors.set(loops, getRawYError());
     }
-    public double getAvgXError(int range){
+    public double getAvgXError(){
     	double sum = 0;
-    	if(xErrors.size() < range+2) return getRawXError();
-    	for(double x : xErrors.subList(xErrors.size()-(range+1), xErrors.size()-1))sum+=x;
-    	return sum/range;
+    	if(xErrors.get(10) != null){
+    		for(double xError : xErrors){
+    			sum+=xError;
+    		}
+    	}
+    	return sum/10;
     }
     public double getAvgYError(int range){
     	double sum = 0;
-    	if(yErrors.size() < range+2) return getRawYError();
-    	for(double y : yErrors.subList(yErrors.size()-(range+1), yErrors.size()-1))sum+=y;
-    	return sum/range;
+    	if(yErrors.get(10) != null){
+    		for(double yError : yErrors){
+    			sum+=yError;
+    		}
+    	}
+    	return sum/10;
     }
 }
