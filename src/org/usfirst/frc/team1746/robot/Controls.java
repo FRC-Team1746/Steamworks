@@ -14,11 +14,6 @@ public class Controls {
 		xbox_operator = new Joystick(electricalConstants.JOYSTICK_OPERATOR);
 	}
 	
-	public void teleopDrive(){
-		drive.arcadeDrive(xbox_driver);
-		
-	}
-	
 	public boolean servoP(){
 		return xbox_driver.getRawButton(2);
 	}

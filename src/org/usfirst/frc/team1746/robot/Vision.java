@@ -1,53 +1,87 @@
 package org.usfirst.frc.team1746.robot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Vision {
 	I2C pixyCam;
-	byte[] toSend = new byte[32];
-	byte[] rawData = new byte[32];
-	
-	List<Double> xErrors = Arrays.asList(new Double[10]);
-	List<Double> yErrors = Arrays.asList(new Double[10]);
-	
-	int xPos = -1;
-	int yPos = -1;
-	int width = -1;
-	int height = -1;
+	DigitalOutput VisionTiming;//<<<<<<<<<<<<<<<<<<<<<<<
+	DigitalOutput PixyReadTiming;//<<<<<<<<<<<<<<<<<<<<<<<
 	
 	boolean foundBothTargets = true;
 	boolean checkSumAValid = true;
 	boolean checkSumBValid = true;
 	boolean sigAValid = true;
 	boolean sigBValid = true;
+	boolean frameFound = true;
+
 	
-	int loops = -1;
 	
     public void init() {
     	pixyCam = new I2C(I2C.Port.kOnboard, 0x54);
+    	VisionTiming = new DigitalOutput(0);//<<<<<<<<<<<<<<<<<<<<<<<
+    	PixyReadTiming = new DigitalOutput(1);//<<<<<<<<<<<<<<<<<<<<<<<
+
     }
     
     public void printPixyStuff(){
     	byte[] pixyValues = new byte[64];
-    	pixyValues[0] = (byte) 0b01010101;
-    	pixyValues[1] = (byte) 0b10101010;
+    	
+    	VisionTiming.set(true);//<<<<<<<<<<<<<<<<<<<<<<<
+    	PixyReadTiming.set(true);//<<<<<<<<<<<<<<<<<<<<<<<
+    	
     	pixyCam.readOnly(pixyValues, 64);
+    	
+    	PixyReadTiming.set(false);  //<<<<<<<<<<<<<<<<<<<<<<<
+
+    	
+    	// debug - print data buffer as hex bytes
+//		System.out.println(">>>Frame <<<<");
+//		for(int j=0; j<64; j++)
+//		{
+//			String hex = Integer.toHexString(pixyValues[j]|0x1000);
+//			System.out.printf(hex.substring(hex.length()-2).toUpperCase().concat(" "));
+//		}
+//    	System.out.printf("\n");	
+    	//Given all of that
+    	//  update average
+    	//  find center between two targets
+    	//  calc distance/angle/etc
+    	// if can't find or validate frame, 
+    	//    - set bad frame flag - possibly make it persistent over tbd frames?
+    	//    - abort and wait for next iteration and new frame data
+    	
+    	foundBothTargets = true;
+    	checkSumAValid = true;
+    	checkSumBValid = true;
+    	sigAValid = true;
+    	sigBValid = true;
+    	frameFound = true;
+    	
+    	//find new frame
     	int i = 0;
     	
-    	
-    	while (!(pixyValues[i] == 0x55 && pixyValues[i + 1] == 0xAA) && i < 36) {
+    	//>>>>>>>>>>>>>>> added 0xff to make it work
+    	while (!( ((pixyValues[i] & 0xff) == 0x55) && ((pixyValues[i + 1] & 0xff) == 0xAA) ) && i < 34) { ///<<<<<<<<<<<<< changed 36 to 34	
     		i++;
-    	}//0-36
+    	}//0-34
     	
-    	if(i >= 36) return; // Word Not Found    	
+    	if(i >= 34)  // Word Not Found    ///<<<<<<<<<<<<< changed 36 to 34	
+    	{
+    		frameFound = false;
+    		return;
+    	}
     	
     	i+=2;//Start of Object
     	
-    	// verify there are two targets
-    	if(!(pixyValues[i] == 0x55 && pixyValues[i+1] == 0xAA && pixyValues[i+14] == 0x55 && pixyValues[i+15] == 0xAA)) {
+    	// verify there are two targets //>>>>>>>>>>>>>>> added 0xff to make it work
+    	if(!( ((pixyValues[i]&0Xff) == 0x55) && ((pixyValues[i+1]&0xff) == 0xAA) && ((pixyValues[i+14]&0xff) == 0x55) && ((pixyValues[i+15]&0xff) == 0xAA) )) {
+//    		System.out.printf("  i+0 = %X",  pixyValues[i]);
+//    		System.out.printf("  i+1 = %X",  pixyValues[i+1]);
+//    		System.out.printf("  i+14 = %X",  pixyValues[i+14]);
+//    		System.out.printf("  i+15 = %X",  pixyValues[i+15]);
+//    		System.out.printf("\n");
     		foundBothTargets = false;
     		return; //couldnt find both frames
     	}
@@ -55,15 +89,16 @@ public class Vision {
     	// verify checksum
     	int checkSumA = 0;
     	int checkSumB = 0;
-    	for(int j=0; j<5; j+=2){
-    		checkSumA += ((pixyValues[j + 5] << 8) | pixyValues[j + 4]);
-    		checkSumB += ((pixyValues[j + 19] << 8) | pixyValues[j + 18]);
+    	for(int j=0; j<10; j+=2){  /// <<<<<<<<<<<<<< Added j<10
+    		checkSumA += (((pixyValues[i+j + 5 ]&0xff) << 8) | (pixyValues[i+j + 4]&0xff)); /// <<<<<<<<<<<<<< Added i+  and 0xff
+//    		System.out.printf("  CkSumA = %X \n",  checkSumA);
+    		checkSumB += (((pixyValues[i+j + 19]&0xff) << 8) | (pixyValues[i+j + 18]&0xff));
     	}
-    	if(checkSumA != ((pixyValues[i + 3] << 8) | pixyValues[i + 2])) {
+    	if(checkSumA != (((pixyValues[i + 3]&0xff) << 8) | (pixyValues[i + 2])&0xff)) {
     		checkSumAValid = false;
     		return;
     	}
-    	if(checkSumB != ((pixyValues[i + 17] << 8) | pixyValues[i + 16])) {
+    	if(checkSumB != (((pixyValues[i + 17]&0xff) << 8) | (pixyValues[i + 16])&0xff) ) {
     		checkSumBValid = false;
     		return;
     	}
@@ -78,41 +113,23 @@ public class Vision {
       		return; 
       	}
     	
-    	//
-   		xPos = (char) ((pixyValues[i + 7] << 8) | pixyValues[i + 6]);
-   		yPos = (char) ((pixyValues[i + 9] << 8) | pixyValues[i + 8]);
-   		width =     (char) ((pixyValues[i + 11]  << 8) | pixyValues[i + 10]);
-   		height =    (char) ((pixyValues[i + 13] << 8) | pixyValues[i + 12]);
-    		
+      	char Signature = (char) (((pixyValues[i + 5]&0xff) << 8)   | (pixyValues[i + 4]&0xff));     ///<<<<<<<<<<< added 0xff
+      	char xPosition1 = (char) (((pixyValues[i + 7]&0xff) << 8)   | (pixyValues[i + 6]&0xff));     ///<<<<<<<<<<< added 0xff
+      	char xPosition2 = (char) (((pixyValues[i + 21]&0xff) << 8)   | (pixyValues[i + 20]&0xff));     ///<<<<<<<<<<< NEW
+      	char xMidPoint = (char) ((xPosition1+xPosition2)/2);
+      	
+      	char yPosition = (char) (((pixyValues[i + 9]&0xff) << 8)   | (pixyValues[i + 8]&0xff));     ///<<<<<<<<<<< added 0xff
+      	char width =     (char) (((pixyValues[i + 11]&0xff)  << 8) | (pixyValues[i + 10]&0xff));    ///<<<<<<<<<<< added 0xff
+      	char height =    (char) (((pixyValues[i + 13]&0xff) << 8)  | (pixyValues[i + 12]&0xff));    ///<<<<<<<<<<< added 0xff
+   		SmartDashboard.putNumber("Signature", Signature);
+    	SmartDashboard.putNumber("xPosition1", xPosition1);
+    	SmartDashboard.putNumber("xPosition2", xPosition2);  /// <<<<<<<<<<<<<<<<<NEW
+    	SmartDashboard.putNumber("xMidPoint", xMidPoint);  
+    	SmartDashboard.putNumber("yPosition", yPosition);
+    	SmartDashboard.putNumber("width", width);
+    	SmartDashboard.putNumber("height", height);
+
+    	VisionTiming.set(false); //<<<<<<<<<<<<<<<
     }
-    public double getRawXError(){
-    	return xPos-150; //x+ move right //x- move left
-    }
-    public double getRawYError(){
-    	return yPos-100; //y+ move up    //y- move down
-    }
-    public void updateErrors(int max){
-    	loops++;
-    	if(loops>9) loops = 0;
-    	xErrors.set(loops, getRawXError());
-    	yErrors.set(loops, getRawYError());
-    }
-    public double getAvgXError(){
-    	double sum = 0;
-    	if(xErrors.get(10) != null){
-    		for(double xError : xErrors){
-    			sum+=xError;
-    		}
-    	}
-    	return sum/10;
-    }
-    public double getAvgYError(int range){
-    	double sum = 0;
-    	if(yErrors.get(10) != null){
-    		for(double yError : yErrors){
-    			sum+=yError;
-    		}
-    	}
-    	return sum/10;
-    }
+    
 }

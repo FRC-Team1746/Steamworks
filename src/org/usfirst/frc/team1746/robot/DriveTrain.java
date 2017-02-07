@@ -24,12 +24,14 @@ public class DriveTrain {
 		drive_leftFront = new Victor(electricalConstants.MOTOR_DRIVE_LEFT_FRONT);
 		drive_leftBack = new Victor(electricalConstants.MOTOR_DRIVE_LEFT_BACK);
 		drive_rightFront = new Victor(electricalConstants.MOTOR_DRIVE_RIGHT_FRONT);
+		drive_rightBack = new Victor(electricalConstants.MOTOR_DRIVE_RIGHT_BACK);
+		
 		
 		myRobot = new RobotDrive(drive_leftFront, drive_leftBack, drive_rightFront, drive_rightBack);
 	}
 	
-	public void arcadeDrive(Joystick stick){
-		myRobot.arcadeDrive(stick);
+	public void teleopDrive(){
+		myRobot.arcadeDrive(controls.xbox_driver);
 	}
 	
 }
