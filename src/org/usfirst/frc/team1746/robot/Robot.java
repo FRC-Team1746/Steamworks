@@ -19,23 +19,23 @@ public class Robot extends IterativeRobot {
 	
 	//Auton auton = new Auton();
 	//Intake intake = new Intake();
-	Vision vision = new Vision();
+	/// Vision vision = new Vision();
 	//Preferences prefs;
-	Controls controls = new Controls();
-	DriveTrain drive = new DriveTrain();
-	Joystick xbox;
-	RobotDrive myRobot;
+	///Controls controls = new Controls();
+	///DriveTrain drive = new DriveTrain();
+	///Joystick xbox;
+	//RobotDrive myRobot;
 	//Solenoid gear0;
 	//Solenoid gear1;
 	//Victor shooter;
 	//Victor conveyor;
 	//Victor loader;
 	//Victor turret;
-	Victor scaling;
+	///Victor scaling;
 	//Talon carol;
 	
-	Servo pixyAZ;
-	Servo pixyEl;
+	///Servo pixyAZ;
+	///Servo pixyEl;
 	
 	//Encoder drive_leftEncoder;
 	//Encoder drive_rightEncoder;
@@ -45,26 +45,25 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void robotInit() {		
-		
+		///drive.init();
 		//auton.initSmartDashboard();
 		//intake.init();
-		//myRobot = new RobotDrive(0,1,2,3);
-		xbox = new Joystick(0);
+		///xbox = new Joystick(0);
 		
 		//gear0 = new Solenoid(0);
 		//gear1 = new Solenoid(1);
 		
 		//carol = new Talon(9);
-		vision.init();
+		///vision.init();
 		//controls.init();
-		pixyAZ = new Servo(9);
-		pixyEl = new Servo(8);
+		///pixyAZ = new Servo(9);
+		///pixyEl = new Servo(8);
 		
 		//loader = new Victor(5);
 		//conveyor = new Victor(6);
 		//shooter = new Victor(7);
 		//turret = new Victor(8);
-		scaling = new Victor(4);
+		///scaling = new Victor(4);
 	}
 
 	@Override
@@ -82,8 +81,8 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		drive.teleopDrive();
-		vision.printPixyStuff();
+		///drive.teleopDrive();
+		///vision.printPixyStuff();
 	}
 		
 	@Override
