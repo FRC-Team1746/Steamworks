@@ -24,7 +24,7 @@ public class GearIntake {
 	}
 	
 	
-	public void update(){
+	public void checkControls(){
 		if(m_controls.operator_gearFlapsOut() || m_controls.driver_gearFlapsOut()){
 			flapsIn.set(false);
 			flapsOut.set(true);

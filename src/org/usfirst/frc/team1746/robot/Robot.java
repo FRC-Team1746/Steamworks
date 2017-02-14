@@ -48,8 +48,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		drive.teleopDrive();
-		climber.update();
-		gear.update();
+		climber.checkControls();
+		gear.checkControls();
 		///vision.printPixyStuff();
 	}
 		

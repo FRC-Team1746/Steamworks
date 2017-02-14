@@ -17,11 +17,7 @@ public class Intake {
 		intake = new Victor(electricalConstants.MOTOR_INTAKE);
 		
 	}
-	public void stop(){
-		intake.set(0);
-	}
-	
-	public void set(int direction){
-		intake.set(direction);
+	public void checkControls(){
+		
 	}
 }

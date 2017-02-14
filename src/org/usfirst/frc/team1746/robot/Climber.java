@@ -17,7 +17,7 @@ public class Climber {
 	}
 	
 	
-	public void update(){
+	public void checkControls(){
 		if(m_controls.operator_climberUp()){
 			climber.set(1);
 		} else if(m_controls.operator_climberDown()){
