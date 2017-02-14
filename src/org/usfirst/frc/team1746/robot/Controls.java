@@ -88,6 +88,7 @@ public class Controls {
 	public boolean operator_gearFlapsIn(){
 		return xbox_operator.getRawButton(6);
 	}
+	//
 	// Toggle Pixy Turret Control
 	public boolean operator_pixyControlOn(){
 		return xbox_operator.getRawButton(8);
