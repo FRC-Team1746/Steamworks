@@ -15,7 +15,7 @@ public class ElectricalConstants {
 	int MOTOR_LOADER = 5;
 	int MOTOR_CONVEYOR= 6;
 	int MOTOR_SHOOTER = 7;
-	int MOTOR_SCALING = 8;
+	int MOTOR_CLIMBER = 8;
 	int MOTOR_TURRET = 9;
 	
 	// MoreBoard
@@ -34,6 +34,8 @@ public class ElectricalConstants {
 	int dio8 = 8;
 	int dio9 = 9;
 	
-	
+	//PCM
+	int GEAR_FLAPS_OUT = 0;
+	int GEAR_FLAPS_IN = 1;
 	
 }

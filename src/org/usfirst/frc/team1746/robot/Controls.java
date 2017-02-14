@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class Controls {
 	ElectricalConstants electricalConstants = new ElectricalConstants();
-	DriveTrain drive = new DriveTrain();
 	
 	Joystick xbox_driver;
 	Joystick xbox_operator;
@@ -63,10 +62,10 @@ public class Controls {
 	}
 	// Gear Flap Control
 	public boolean driver_gearFlapsOut(){
-		return xbox_driver.getRawButton(6);
+		return xbox_driver.getRawButton(5);
 	}
 	public boolean driver_gearFlapsIn(){
-		return xbox_driver.getRawButton(7);
+		return xbox_driver.getRawButton(6);
 	}
 	// Toggle Pixy Turret Control
 	public boolean driver_pixyControlOn(){
@@ -84,10 +83,10 @@ public class Controls {
 // Operator	
 	// Gear Flap Control
 	public boolean operator_gearFlapsOut(){
-		return xbox_operator.getRawButton(6);
+		return xbox_operator.getRawButton(5);
 	}
 	public boolean operator_gearFlapsIn(){
-		return xbox_operator.getRawButton(7);
+		return xbox_operator.getRawButton(6);
 	}
 	// Toggle Pixy Turret Control
 	public boolean operator_pixyControlOn(){
@@ -112,12 +111,12 @@ public class Controls {
 	public boolean operator_conveyor(){
 		return xbox_operator.getRawAxis(3) != .5;
 	}
-	// Scaling Control
-	public boolean operator_scalingUp(){
-		return xbox_operator.getPort() == 315 || xbox_operator.getPort() == 0 || xbox_operator.getPort() == 45 ;
+	// climber Control
+	public boolean operator_climberUp(){
+		return xbox_operator.getPOV() == 315 || xbox_operator.getPOV() == 0 || xbox_operator.getPOV() == 45 ;
 	}
-	public boolean operator_scalingDown(){
-		return xbox_operator.getPort() == 135 || xbox_operator.getPort() == 180 || xbox_operator.getPort() == 225 ;
+	public boolean operator_climberDown(){
+		return xbox_operator.getPOV() == 135 || xbox_operator.getPOV() == 180 || xbox_operator.getPOV() == 225 ;
 	}
 /*********************************************************************************/
 }
