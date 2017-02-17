@@ -104,8 +104,8 @@ public class Controls {
 	public double operator_hoodPosition(){
 		return xbox_operator.getRawAxis(5);
 	}
-	// Indexer Toggle
-	public boolean operator_indexer(){
+	// Loader Toggle
+	public boolean operator_loader(){
 		return xbox_operator.getRawAxis(2) != .5;
 	}
 	// Conveyor Toggle

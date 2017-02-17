@@ -18,6 +18,12 @@ public class Intake {
 		
 	}
 	public void checkControls(){
-		
+		if(m_controls.driver_intakeBalls()){
+			intake.set(1);
+		} else if(m_controls.driver_outtakeBalls()){
+			intake.set(-1);
+		} else {
+			intake.set(0);
+		}
 	}
 }

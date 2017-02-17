@@ -3,33 +3,32 @@ package org.usfirst.frc.team1746.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 
 public class Robot extends IterativeRobot {
-	///Auton auton = new Auton();
-	///Intake intake = new Intake();
-	/// Vision vision = new Vision();
-	ElectricalConstants eConstants;
+	Vision vision;
 	Controls controls;
 	DriveTrain drive;
 	Climber climber;
 	GearIntake gear;
 	Intake intake;
+	Loader loader;
 
 	@Override
 	public void robotInit() {
 		controls = new Controls();
-		eConstants = new ElectricalConstants();
+		vision = new Vision();
 		drive = new DriveTrain(controls);
 		climber = new Climber(controls); 
 		gear = new GearIntake(controls);
 		intake = new Intake(controls);
-		drive.init();
+		loader = new Loader(controls);
+		
 		controls.init();
+		vision.init();
+		drive.init();
+		
 		climber.init();
 		gear.init();
-		
-		
-		//auton.initSmartDashboard();
-		//intake.init();
-		//vision.init();
+		loader.init();
+		intake.init();
 	}
 
 	@Override
@@ -47,10 +46,12 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopPeriodic() {
+		vision.printPixyStuff();
 		drive.teleopDrive();
 		climber.checkControls();
 		gear.checkControls();
-		///vision.printPixyStuff();
+		intake.checkControls();
+		loader.checkControls();
 	}
 		
 	@Override
