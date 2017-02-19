@@ -6,7 +6,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Auton {
 	SendableChooser<String> autonSelector = new SendableChooser<>();
 	
-	public enum autonStates {
+	private Drivetrain m_drive;
+	public Auton(Drivetrain drive) {
+		m_drive = drive;
+	}
+	
+	public enum States {
 		INIT,
 		DRIVE_INIT,
 		DRIVE_TO_PEG,
@@ -19,6 +24,8 @@ public class Auton {
 	}
 	
 	
+	
+
 	public void initSmartDashboard() {
 		autonSelector.addDefault("Default", "default");
 		autonSelector.addObject("Left Gear", "leftGear");
@@ -27,9 +34,10 @@ public class Auton {
 
 		SmartDashboard.putData("Auton Selector", autonSelector);
 	}
-	autonStates autonState;
+	
+	States currentState;
 	public void init(){
-		autonState = autonStates.INIT; 
+		currentState = States.INIT; 
 		
 	}
 	
@@ -37,47 +45,46 @@ public class Auton {
 		return autonSelector.getSelected();
 	}
 	
-	
 	public void centerGearAuton(){
-		switch(autonState){
+		switch(currentState){
 		case INIT: 
-			
-			autonState = autonStates.DRIVE_INIT;
+			m_drive.resetEncoders();
+			currentState = States.DRIVE_INIT;
 		break;
 		
 		case DRIVE_INIT:
 			
-			autonState = autonStates.DRIVE_TO_PEG;
+			currentState = States.DRIVE_TO_PEG;
 		break;
 		
 		case DRIVE_TO_PEG: 
 			
-			autonState = autonStates.DRIVE_HALT;
+			currentState = States.DRIVE_HALT;
 		break;
 		
 		case DRIVE_HALT: 
 			
-			autonState = autonStates.WAIT_GEAR_REMOVAL;
+			currentState = States.WAIT_GEAR_REMOVAL;
 		break;
 		
 		case WAIT_GEAR_REMOVAL: 
 			
-			autonState = autonStates.DRIVE_FROM_PEG;
+			currentState = States.DRIVE_FROM_PEG;
 		break;
 		
 		case DRIVE_FROM_PEG: 
 			
-			autonState = autonStates.DRIVE_ROTATE;
+			currentState = States.DRIVE_ROTATE;
 		break;
 		
 		case DRIVE_ROTATE: 
 			
-			autonState = autonStates.DRIVE_TO_CENTER;
+			currentState = States.DRIVE_TO_CENTER;
 		break;
 		
 		case DRIVE_TO_CENTER:
 			
-			autonState = autonStates.WAIT_TELEOP;
+			currentState = States.WAIT_TELEOP;
 		break;
 		case WAIT_TELEOP: 
 			

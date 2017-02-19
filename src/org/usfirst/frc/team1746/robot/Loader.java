@@ -19,9 +19,9 @@ public class Loader {
 
 	public void checkControls(){
 		if(m_controls.operator_loader()){
-			loader.set(1);
-		} else if(m_controls.operator_loader()){
 			loader.set(-1);
+		} else if(m_controls.operator_loader()){
+			loader.set(1);
 		} else {
 			loader.set(0);
 		}

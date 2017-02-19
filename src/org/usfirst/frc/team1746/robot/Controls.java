@@ -78,6 +78,13 @@ public class Controls {
 	public boolean driver_gearAllign(){
 		return xbox_driver.getRawButton(8); 
 	}
+	// Left Axis
+	public int driver_leftAxis(){
+		return 1;
+	}
+	public int driver_rightAxis(){
+		return 5;
+	}
 	
 /*********************************************************************************/
 // Operator	
@@ -106,11 +113,11 @@ public class Controls {
 	}
 	// Loader Toggle
 	public boolean operator_loader(){
-		return xbox_operator.getRawAxis(2) != .5;
+		return xbox_operator.getRawAxis(3) > .05;
 	}
 	// Conveyor Toggle
 	public boolean operator_conveyor(){
-		return xbox_operator.getRawAxis(3) != .5;
+		return xbox_operator.getRawAxis(2) > .05;
 	}
 	// climber Control
 	public boolean operator_climberUp(){
