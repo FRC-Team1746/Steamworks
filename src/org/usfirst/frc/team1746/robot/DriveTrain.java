@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1746.robot;
 
+import java.awt.geom.CubicCurve2D;
+
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
@@ -72,11 +74,18 @@ public class Drivetrain {
 		encoderRight.reset();
 	}
 	public double leftEncoderTicks(){
-		return encoderLeft.get();
+		return -encoderLeft.get();
 	}
 	public double rightEncoderTicks(){
 		return encoderRight.get();
 	}
+	public double avgEncoderTicks(){
+		return (leftEncoderTicks() + rightEncoderTicks())/2;
+	}
+	public double encoderError(){
+		return leftEncoderTicks() - rightEncoderTicks();
+	}
+	
 	
 	public void resetGyro(){
 		gyro.reset();
@@ -92,39 +101,44 @@ public class Drivetrain {
 		SmartDashboard.putNumber("Left Encoder", leftEncoderTicks());
 		SmartDashboard.putNumber("Right Encoder", rightEncoderTicks());
 	}
-//	public void drivePID(double desiredLeftMotorSpeed){
-//		double P = .02;
-//		double encoderError = encoderLeft.get() - encoderRight.get();
-//		double rightMotorSpeed;
-//		if(desiredLeftMotorSpeed >= 0){
-//			if(leftMotorSpeed < desiredLeftMotorSpeed){
-//				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
-//			}else if(leftMotorSpeed > desiredLeftMotorSpeed){
-//				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
-//			}else{
-//				leftMotorSpeed = desiredLeftMotorSpeed;
-//			}
-//		} else{
-//			if(leftMotorSpeed > desiredLeftMotorSpeed){
-//				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
-//			}else if(leftMotorSpeed < desiredLeftMotorSpeed){
-//				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
-//			}else{
-//				leftMotorSpeed = desiredLeftMotorSpeed;
-//			}
-//		}
-//		
-//		rightMotorSpeed = leftMotorSpeed + P*encoderError;
-//		myRobot.setLeftRightMotorOutputs(leftMotorSpeed, rightMotorSpeed);
-//	}
+	public void straight(double speed){
+		myRobot.setLeftRightMotorOutputs(speed, speed);
+	}
+	public void stop(){
+		myRobot.stopMotor();
+	}
+	public void straightPID(double desiredLeftMotorSpeed){
+		desiredLeftMotorSpeed = -desiredLeftMotorSpeed;
+		double P = .02;
+		double rightMotorSpeed;
+		if(desiredLeftMotorSpeed >= 0){
+			if(leftMotorSpeed < desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
+			}else if(leftMotorSpeed > desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
+			}else{
+				leftMotorSpeed = desiredLeftMotorSpeed;
+			}
+		} else{
+			if(leftMotorSpeed > desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
+			}else if(leftMotorSpeed < desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
+			}else{
+				leftMotorSpeed = desiredLeftMotorSpeed;
+			}
+		}
+		rightMotorSpeed = leftMotorSpeed + P*encoderError();
+		myRobot.setLeftRightMotorOutputs(leftMotorSpeed, rightMotorSpeed);
+	}
 	
-//	public void driveRotate(String direction){
-//		if(direction.equalsIgnoreCase("left")){		
-//			myRobot.setLeftRightMotorOutputs(.5, -.5);
-//		} else if(direction.equalsIgnoreCase("right")){
-//			myRobot.setLeftRightMotorOutputs(-.5, .5);
-//		}
-//	}
+	public void rotate(String direction){
+		if(direction.equalsIgnoreCase("left")){		
+			myRobot.setLeftRightMotorOutputs(.5, -.5);
+		} else if(direction.equalsIgnoreCase("right")){
+			myRobot.setLeftRightMotorOutputs(-.5, .5);
+		}
+	}
 	
 	
 	

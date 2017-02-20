@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Auton {
 	SendableChooser<String> autonSelector = new SendableChooser<>();
+	AutonConstants aConstants = new AutonConstants();
 	
 	private Drivetrain m_drive;
 	public Auton(Drivetrain drive) {
@@ -37,6 +38,7 @@ public class Auton {
 	
 	States currentState;
 	public void init(){
+		m_drive.resetEncoders();
 		currentState = States.INIT; 
 		
 	}
@@ -53,16 +55,20 @@ public class Auton {
 		break;
 		
 		case DRIVE_INIT:
-			
+			m_drive.resetEncoders();
 			currentState = States.DRIVE_TO_PEG;
 		break;
 		
 		case DRIVE_TO_PEG: 
-			
-			currentState = States.DRIVE_HALT;
+			m_drive.straightPID(.4);
+			if(m_drive.avgEncoderTicks() > aConstants.DIST_GEAR_PEG){
+				m_drive.stop();
+				m_drive.resetEncoders();
+				currentState = States.DRIVE_HALT;
+			}
 		break;
 		
-		case DRIVE_HALT: 
+		case DRIVE_HALT:
 			
 			currentState = States.WAIT_GEAR_REMOVAL;
 		break;

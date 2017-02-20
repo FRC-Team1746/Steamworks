@@ -27,16 +27,20 @@ public class Robot extends IterativeRobot {
 		controls.init();
 		vision.init();
 		drive.init();
+		auton.init();
 		
 		climber.init();
 		gear.init();
 		loader.init();
 		intake.init();
+		
+		
+		initSmartDashboard();
 	}
 
 	@Override
 	public void autonomousInit() {
-		
+		auton.init();
 	}
 	public void disabledPeriodic(){
 		updateSmartDashboard();
@@ -45,6 +49,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		updateSmartDashboard();
+		auton.centerGearAuton();
 	}
 
 	@Override

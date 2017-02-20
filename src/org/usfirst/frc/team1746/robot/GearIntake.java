@@ -1,6 +1,5 @@
 package org.usfirst.frc.team1746.robot;
 
-import java.lang.reflect.Parameter;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
