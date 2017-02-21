@@ -1,7 +1,5 @@
 package org.usfirst.frc.team1746.robot;
 
-import java.awt.geom.CubicCurve2D;
-
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
@@ -74,10 +72,10 @@ public class Drivetrain {
 		encoderRight.reset();
 	}
 	public double leftEncoderTicks(){
-		return -encoderLeft.get();
+		return encoderLeft.get();
 	}
 	public double rightEncoderTicks(){
-		return encoderRight.get();
+		return -encoderRight.get();
 	}
 	public double avgEncoderTicks(){
 		return (leftEncoderTicks() + rightEncoderTicks())/2;
@@ -93,13 +91,26 @@ public class Drivetrain {
 	public double gyroAngle(){
 		return gyro.getAngle();
 	}
-	
+	public void calibrateGyro(){
+		gyro.calibrate();
+	}
 	public void initSmartDashboard(){
+		SmartDashboard.putBoolean("Reset Encoders", false);
+		SmartDashboard.putBoolean("Calibrate Gyro", false);
 		
 	}
 	public void updateSmartDashboard(){
+		if(SmartDashboard.getBoolean("Reset Encoders", false)){
+			resetEncoders();
+			SmartDashboard.putBoolean("Reset Encoders", false);
+		}
+		if(SmartDashboard.getBoolean("Calibrate Gyro", false)){
+			calibrateGyro();
+			SmartDashboard.putBoolean("Calibrate Gyro", false);
+		}
 		SmartDashboard.putNumber("Left Encoder", leftEncoderTicks());
 		SmartDashboard.putNumber("Right Encoder", rightEncoderTicks());
+		SmartDashboard.putNumber("Gyro Angle", gyroAngle());
 	}
 	public void straight(double speed){
 		myRobot.setLeftRightMotorOutputs(speed, speed);
@@ -108,7 +119,7 @@ public class Drivetrain {
 		myRobot.stopMotor();
 	}
 	public void straightPID(double desiredLeftMotorSpeed){
-		desiredLeftMotorSpeed = -desiredLeftMotorSpeed;
+		
 		double P = .02;
 		double rightMotorSpeed;
 		if(desiredLeftMotorSpeed >= 0){
@@ -128,15 +139,15 @@ public class Drivetrain {
 				leftMotorSpeed = desiredLeftMotorSpeed;
 			}
 		}
-		rightMotorSpeed = leftMotorSpeed + P*encoderError();
+		rightMotorSpeed = leftMotorSpeed - P*encoderError();
 		myRobot.setLeftRightMotorOutputs(leftMotorSpeed, rightMotorSpeed);
 	}
 	
 	public void rotate(String direction){
 		if(direction.equalsIgnoreCase("left")){		
-			myRobot.setLeftRightMotorOutputs(.5, -.5);
+			myRobot.setLeftRightMotorOutputs(.35, -.35);
 		} else if(direction.equalsIgnoreCase("right")){
-			myRobot.setLeftRightMotorOutputs(-.5, .5);
+			myRobot.setLeftRightMotorOutputs(-.35, .35);
 		}
 	}
 	

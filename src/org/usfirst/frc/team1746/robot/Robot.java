@@ -12,7 +12,9 @@ public class Robot extends IterativeRobot {
 	Intake intake;
 	Loader loader;
 	Auton auton;
-
+	AutonRRG autonRRG;
+	AutonRLG autonRLG;
+	
 	@Override
 	public void robotInit() {
 		controls = new Controls();
@@ -22,7 +24,9 @@ public class Robot extends IterativeRobot {
 		gear = new GearIntake(controls);
 		intake = new Intake(controls);
 		loader = new Loader(controls);
-		auton = new Auton(drive);
+		auton = new Auton(drive, gear);
+		autonRRG = new AutonRRG(drive, gear);
+		autonRLG = new AutonRLG(drive, gear);
 		
 		controls.init();
 		vision.init();
@@ -41,6 +45,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		auton.init();
+		autonRRG.init();
+		autonRLG.init();
 	}
 	public void disabledPeriodic(){
 		updateSmartDashboard();
@@ -49,7 +55,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		updateSmartDashboard();
-		auton.centerGearAuton();
+		autonRLG.auton();
 	}
 
 	@Override
@@ -82,6 +88,7 @@ public class Robot extends IterativeRobot {
 	
 	public void updateSmartDashboard(){
 		drive.updateSmartDashboard();
+		auton.updateSmartDashboard();
 	}
 }
 
