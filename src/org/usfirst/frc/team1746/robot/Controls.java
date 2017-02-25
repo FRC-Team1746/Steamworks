@@ -116,7 +116,7 @@ public class Controls {
 		return xbox_operator.getRawAxis(3) > .05;
 	}
 	// Conveyor Toggle
-	public boolean operator_conveyor(){
+	public boolean operator_conveyor_shooter(){
 		return xbox_operator.getRawAxis(2) > .05;
 	}
 	// climber Control

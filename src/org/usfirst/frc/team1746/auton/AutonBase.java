@@ -1,12 +1,13 @@
-package org.usfirst.frc.team1746.robot;
+package org.usfirst.frc.team1746.auton;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Auton {
+
+
+public class AutonBase {
 	SendableChooser<String> autonSelector = new SendableChooser<>();
 	SendableChooser<String> allianceSelector = new SendableChooser<>();
-	AutonConstants aConstants = new AutonConstants();
 	
 	int loops = 0;
 	
@@ -60,4 +61,7 @@ public class Auton {
 		
 	}
 	
+	public void run(String auton){
+		
+	}
 }

@@ -3,6 +3,7 @@ package org.usfirst.frc.team1746.robot;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class GearIntake {
 
@@ -32,13 +33,19 @@ public class GearIntake {
 		flapsIn = new Solenoid(eConstants.GEAR_FLAPS_IN);
 		beambreak = new DigitalInput(eConstants.DIFFUSE_GEAR);
 		
-		lastBB = !beambreak.get();
-		nowBB = beambreak.get();
-		
-		
 		flapsIn();
 	}
 	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///// GearIntake SmartDashboard
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	
+	public void initSmartDashboard(){
+		
+	}
+	public void updateSmartDashboard(){
+		SmartDashboard.putBoolean("Gear Sensor", beambreak.get());
+	}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///// GearIntake functions
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,17 +70,12 @@ public class GearIntake {
 	//m_controls.operator_gearFlapsIn() || m_controls.driver_gearFlapsIn)
 	
 	public void smartFlaps(){
-		if(lastBB == nowBB){
-			checkControls();
-		} else {
-			if(beambreak.get()){
+			if(!beambreak.get()){
 				flapsIn();
 			}
-			if(!beambreak.get()){
+			else {
 				flapsOut();
 			}
-		}
-		lastBB = beambreak.get();
 	}
 
 	public void checkControls(){

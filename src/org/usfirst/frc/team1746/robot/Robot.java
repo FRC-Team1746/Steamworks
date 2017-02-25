@@ -1,7 +1,8 @@
 package org.usfirst.frc.team1746.robot;
 
+import org.usfirst.frc.team1746.auton.AutonBase;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 	Vision vision;
@@ -11,9 +12,13 @@ public class Robot extends IterativeRobot {
 	GearIntake gear;
 	Intake intake;
 	Loader loader;
-	Auton auton;
-	AutonRRG autonRRG;
-	AutonRLG autonRLG;
+	Conveyor conveyor;
+	//Auton auton;
+	//AutonRRG autonRRG;
+	//AutonRLG autonRLG;
+	Shooter shooter;
+	
+	AutonBase auton;
 	
 	@Override
 	public void robotInit() {
@@ -24,29 +29,31 @@ public class Robot extends IterativeRobot {
 		gear = new GearIntake(controls);
 		intake = new Intake(controls);
 		loader = new Loader(controls);
-		auton = new Auton(drive, gear);
-		autonRRG = new AutonRRG(drive, gear);
-		autonRLG = new AutonRLG(drive, gear);
-		
+		shooter = new Shooter(controls);
+		conveyor = new Conveyor(controls);
+		//auton = new Auton(/*drive, gear*/);
+		//autonRRG = new AutonRRG(drive, gear);
+		//autonRLG = new AutonRLG(drive, gear);
+		shooter.init();
 		controls.init();
 		vision.init();
 		drive.init();
-		auton.init();
-		
+		//auton.init();
+		controls.init();
 		climber.init();
 		gear.init();
 		loader.init();
 		intake.init();
-		
+		conveyor.init();
 		
 		initSmartDashboard();
 	}
 
 	@Override
 	public void autonomousInit() {
-		auton.init();
-		autonRRG.init();
-		autonRLG.init();
+		//auton.init();
+		//autonRRG.init();
+		//autonRLG.init();
 	}
 	public void disabledPeriodic(){
 		updateSmartDashboard();
@@ -55,7 +62,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		updateSmartDashboard();
-		autonRLG.auton();
+		//autonRLG.auton();
 	}
 
 	@Override
@@ -72,7 +79,10 @@ public class Robot extends IterativeRobot {
 		
 		loader.checkControls();
 		
-		gear.checkControls();
+		gear.smartFlaps();
+		
+		conveyor.checkControls();
+		shooter.checkControls();
 		
 	}
 		
@@ -82,13 +92,16 @@ public class Robot extends IterativeRobot {
 	} 
 	
 	public void initSmartDashboard(){
-		auton.initSmartDashboard();
+		//auton.initSmartDashboard();
 		drive.initSmartDashboard();
+		shooter.initSmartDashboard();
 	}
 	
 	public void updateSmartDashboard(){
 		drive.updateSmartDashboard();
-		auton.updateSmartDashboard();
+		//auton.updateSmartDashboard();
+		gear.updateSmartDashboard();
+		shooter.updateSmartDashboard();
 	}
 }
 

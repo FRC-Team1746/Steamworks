@@ -150,7 +150,4 @@ public class Drivetrain {
 			myRobot.setLeftRightMotorOutputs(-.35, .35);
 		}
 	}
-	
-	
-	
 }
