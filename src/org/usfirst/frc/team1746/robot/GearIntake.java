@@ -23,6 +23,8 @@ public class GearIntake {
 
 	Solenoid flapsOut;
 	Solenoid flapsIn;
+	Solenoid LEDLeft;
+	Solenoid LEDRight;
 	DigitalInput beambreak;
 	
 	boolean lastBB;
@@ -31,6 +33,8 @@ public class GearIntake {
 	public void init(){
 		flapsOut = new Solenoid(eConstants.GEAR_FLAPS_OUT);
 		flapsIn = new Solenoid(eConstants.GEAR_FLAPS_IN);
+		LEDLeft = new Solenoid(eConstants.GEAR_LED_LEFT);
+		LEDRight = new Solenoid(eConstants.GEAR_LED_RIGHT);
 		beambreak = new DigitalInput(eConstants.DIFFUSE_GEAR);
 		
 		flapsIn();
@@ -63,7 +67,14 @@ public class GearIntake {
 		flapsOut.set(false);
 		flapsIn.set(true);
 	}
-	
+	public void LEDOn(){
+		LEDLeft.set(true);
+		LEDRight.set(true);
+	}
+	public void LEDOff(){
+		LEDLeft.set(false);
+		LEDRight.set(false);
+	}
 	//beambreak.get()
 	//!beambreak.get()
 	//m_controls.operator_gearFlapsOut() || m_controls.driver_gearFlapsOut()
@@ -72,9 +83,11 @@ public class GearIntake {
 	public void smartFlaps(){
 			if(!beambreak.get()){
 				flapsIn();
+				LEDOn();
 			}
 			else {
 				flapsOut();
+				LEDOff();
 			}
 	}
 
