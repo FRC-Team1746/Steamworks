@@ -50,8 +50,8 @@ public class ElectricalConstants {
 	int pcm3 = 3;
 	int pcm4 = 4;
 	int pcm5 = 5;
-	int pcm6 = 6;
-	int pcm7 = 7;
+	int GEAR_LED_LEFT = 6;
+	int GEAR_LED_RIGHT = 7;
 	
 	//Relay
 	int relay0 = 0;
