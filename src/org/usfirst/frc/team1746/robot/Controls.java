@@ -85,7 +85,10 @@ public class Controls {
 	public int driver_rightAxis(){
 		return 5;
 	}
-	
+	// Rotate to Set Degree
+	public boolean driver_allign(int degree){
+		return xbox_driver.getPOV() == degree;
+	}
 /*********************************************************************************/
 // Operator	
 	// Gear Flap Control

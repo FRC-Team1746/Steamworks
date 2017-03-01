@@ -57,8 +57,6 @@ public class GearIntake {
 	public boolean gearSensor(){
 		return beambreak.get();
 	}
-	
-	
 	public void flapsOut(){
 		flapsIn.set(false);
 		flapsOut.set(true);
@@ -67,11 +65,11 @@ public class GearIntake {
 		flapsOut.set(false);
 		flapsIn.set(true);
 	}
-	public void LEDOn(){
+	public void LEDsOn(){
 		LEDLeft.set(true);
 		LEDRight.set(true);
 	}
-	public void LEDOff(){
+	public void LEDsOff(){
 		LEDLeft.set(false);
 		LEDRight.set(false);
 	}
@@ -80,17 +78,49 @@ public class GearIntake {
 	//m_controls.operator_gearFlapsOut() || m_controls.driver_gearFlapsOut()
 	//m_controls.operator_gearFlapsIn() || m_controls.driver_gearFlapsIn)
 	
+	
+	//false = in
+	//true = out
+	
+	boolean prevBeam = false;
+	boolean prevControlOut = false;
+	boolean prevControlIn = false;
+	int loops = 0;
 	public void smartFlaps(){
-			if(!beambreak.get()){
+			// Controls: Flaps In
+			if((m_controls.driver_gearFlapsIn() || m_controls.operator_gearFlapsIn()) && !prevControlIn){ //controllers says go in
 				flapsIn();
-				LEDOn();
+				prevControlIn = true;
 			}
-			else {
+				
+			if(!(m_controls.driver_gearFlapsIn() || m_controls.operator_gearFlapsIn()) && prevControlIn){ //controllers says go in
+				prevControlIn = false;
+			}
+			
+			
+			// Controls: Flaps Out
+			if((m_controls.driver_gearFlapsOut() || m_controls.operator_gearFlapsOut()) && !prevControlOut){
 				flapsOut();
-				LEDOff();
+				prevControlOut = true;
+			}
+			if(!(m_controls.driver_gearFlapsOut() || m_controls.operator_gearFlapsOut()) && prevControlOut){
+				prevControlOut = false;
+			}
+			
+			// Sensor
+			if(!beambreak.get() && !prevBeam){ // gear detected
+				flapsIn();
+				LEDsOn();
+				prevBeam = true;
+			}
+			if(beambreak.get() && prevBeam){ // gear no longer detected
+				flapsOut();
+				LEDsOff();
+				prevBeam = false;
 			}
 	}
-
+	
+	// Not Used
 	public void checkControls(){
 		if(m_controls.operator_gearFlapsOut() || m_controls.driver_gearFlapsOut()){
 			flapsOut();

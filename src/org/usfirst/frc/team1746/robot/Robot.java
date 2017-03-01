@@ -13,9 +13,6 @@ public class Robot extends IterativeRobot {
 	Intake intake;
 	Loader loader;
 	Conveyor conveyor;
-	//Auton auton;
-	//AutonRRG autonRRG;
-	//AutonRLG autonRLG;
 	Shooter shooter;
 	
 	AutonBase auton;
@@ -31,14 +28,12 @@ public class Robot extends IterativeRobot {
 		loader = new Loader(controls);
 		shooter = new Shooter(controls);
 		conveyor = new Conveyor(controls);
-		//auton = new Auton(/*drive, gear*/);
-		//autonRRG = new AutonRRG(drive, gear);
-		//autonRLG = new AutonRLG(drive, gear);
+		auton = new AutonBase(drive, gear);
 		shooter.init();
 		controls.init();
 		vision.init();
 		drive.init();
-		//auton.init();
+		auton.init();
 		controls.init();
 		climber.init();
 		gear.init();
@@ -51,9 +46,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
-		//auton.init();
-		//autonRRG.init();
-		//autonRLG.init();
+		//auton.init()'
 	}
 	public void disabledPeriodic(){
 		updateSmartDashboard();
@@ -61,8 +54,8 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousPeriodic() {
+		auton.run();
 		updateSmartDashboard();
-		//autonRLG.auton();
 	}
 
 	@Override
@@ -81,6 +74,7 @@ public class Robot extends IterativeRobot {
 		
 		gear.smartFlaps();
 		
+		
 		conveyor.checkControls();
 		shooter.checkControls();
 		
@@ -92,14 +86,14 @@ public class Robot extends IterativeRobot {
 	} 
 	
 	public void initSmartDashboard(){
-		//auton.initSmartDashboard();
+		auton.initSmartDashboard();
 		drive.initSmartDashboard();
 		shooter.initSmartDashboard();
 	}
 	
 	public void updateSmartDashboard(){
 		drive.updateSmartDashboard();
-		//auton.updateSmartDashboard();
+		auton.updateSmartDashboard();
 		gear.updateSmartDashboard();
 		shooter.updateSmartDashboard();
 	}
