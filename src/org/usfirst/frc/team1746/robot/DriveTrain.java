@@ -64,7 +64,7 @@ public class Drivetrain {
 	}
 	
 	int sumEncoderErrors;
-	double motorSpeed = 0; //<======== Need to figure out how to get this?
+	double leftMotorSpeed = 0; //<======== Need to figure out how to get this?
 	double MOTOR_INCREMENT_RATE = .01;
 	
 	public void resetEncoders(){
@@ -118,30 +118,28 @@ public class Drivetrain {
 	public void stop(){
 		myRobot.stopMotor();
 	}
-	public void straightPID(double desiredMotorSpeed){
+	public void straightPID(double desiredLeftMotorSpeed){
 		
-		double P = .1;
-		double leftMotorSpeed;
+		double P = .02;
 		double rightMotorSpeed;
-		if(desiredMotorSpeed >= 0){
-			if(motorSpeed < desiredMotorSpeed){
-				motorSpeed = motorSpeed+MOTOR_INCREMENT_RATE;
-			}else if(motorSpeed > desiredMotorSpeed){
-				motorSpeed = motorSpeed-MOTOR_INCREMENT_RATE;
+		if(desiredLeftMotorSpeed >= 0){
+			if(leftMotorSpeed < desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
+			}else if(leftMotorSpeed > desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
 			}else{
-				motorSpeed = desiredMotorSpeed;
+				leftMotorSpeed = desiredLeftMotorSpeed;
 			}
 		} else{
-			if(motorSpeed > desiredMotorSpeed){
-				motorSpeed = motorSpeed-MOTOR_INCREMENT_RATE;
-			}else if(motorSpeed < desiredMotorSpeed){
-				motorSpeed = motorSpeed+MOTOR_INCREMENT_RATE;
+			if(leftMotorSpeed > desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed-MOTOR_INCREMENT_RATE;
+			}else if(leftMotorSpeed < desiredLeftMotorSpeed){
+				leftMotorSpeed = leftMotorSpeed+MOTOR_INCREMENT_RATE;
 			}else{
-				motorSpeed = desiredMotorSpeed;
+				leftMotorSpeed = desiredLeftMotorSpeed;
 			}
 		}
-		rightMotorSpeed = motorSpeed - P*encoderError();
-		leftMotorSpeed = motorSpeed + P*encoderError();
+		rightMotorSpeed = leftMotorSpeed - P*encoderError();
 		myRobot.setLeftRightMotorOutputs(leftMotorSpeed, rightMotorSpeed);
 	}
 	
@@ -152,4 +150,7 @@ public class Drivetrain {
 			myRobot.setLeftRightMotorOutputs(-.35, .35);
 		}
 	}
+	
+	
+	
 }
