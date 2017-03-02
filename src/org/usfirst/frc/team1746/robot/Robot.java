@@ -28,7 +28,7 @@ public class Robot extends IterativeRobot {
 		loader = new Loader(controls);
 		shooter = new Shooter(controls);
 		conveyor = new Conveyor(controls);
-		auton = new AutonBase(drive, gear);
+		auton = new AutonBase(drive, gear, loader, shooter);
 		shooter.init();
 		controls.init();
 		vision.init();
@@ -82,7 +82,7 @@ public class Robot extends IterativeRobot {
 		
 	@Override
 	public void testPeriodic() {
-		
+		shooter.setRPM("");
 	} 
 	
 	public void initSmartDashboard(){

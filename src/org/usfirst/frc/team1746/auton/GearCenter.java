@@ -2,6 +2,8 @@ package org.usfirst.frc.team1746.auton;
 
 import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
+import org.usfirst.frc.team1746.robot.Loader;
+import org.usfirst.frc.team1746.robot.Shooter;
 
 public class GearCenter {
 	
@@ -11,14 +13,22 @@ public class GearCenter {
 	
 	private Drivetrain m_drive;
 	private GearIntake m_gear;
-	public GearCenter(Drivetrain drive, GearIntake gear){
+	private Loader m_loader;
+	private Shooter m_shooter;
+	public GearCenter(Drivetrain drive, GearIntake gear, Loader loader, Shooter shooter){
 		m_drive = drive;
 		m_gear = gear;
+		m_loader = loader;
+		m_shooter = shooter;
 	}
 	
 	public enum States {
 		INIT,
+		SHOOT_INIT,
+		SHOOT,
 		DRIVE_INIT,
+		DRIVE_BACKUP,
+		ROTATE_PEG,
 		DRIVE_TO_PEG,
 		DRIVE_HALT,
 		WAIT_GEAR_REMOVAL,
@@ -42,20 +52,66 @@ public class GearCenter {
 	public void init(){
 		resetState();
 	}
-	public void auton(String alliance){
+	public void auton(String alliance, boolean shoot){
 		switch(currentState){
 		case INIT: 
 			m_drive.resetEncoders();
-			currentState = States.DRIVE_INIT;
+			currentState = States.SHOOT;
+		break;
+		case SHOOT_INIT:
+			if(shoot){
+				loops++;
+				m_shooter.setRPM(aConstants.C_SHOOTER_RPM);
+				if(loops > 50){
+					loops = 0;
+					currentState = States.SHOOT;
+				}
+			} else {
+				currentState = States.DRIVE_INIT;
+			}
+		break;
+		case SHOOT:
+			loops++;
+			m_loader.set(1);
+			if(loops > 300){
+				loops = 0;
+				m_loader.stop();
+				m_shooter.stop();
+				currentState = States.DRIVE_INIT;
+			}
 		break;
 		case DRIVE_INIT:
 			m_drive.resetEncoders();
-			currentState = States.DRIVE_TO_PEG;
+			if(alliance.equalsIgnoreCase("blue")){
+				currentState = States.DRIVE_BACKUP;
+			} else {
+				currentState = States.DRIVE_TO_PEG;
+			}
 		break;
-		
+		case DRIVE_BACKUP:
+			m_drive.straightPID(.4);
+			if(m_drive.avgEncoderTicks() > aConstants.C_DIST_BACKUP){
+				m_drive.stop();
+				m_drive.resetEncoders();
+				currentState = States.ROTATE_PEG;
+			}
+		break;
+		case ROTATE_PEG:
+			m_drive.rotate("left");
+			if(m_drive.gyroAngle() > 175){
+				m_drive.stop();
+				m_drive.resetEncoders();
+				currentState = States.DRIVE_TO_PEG;
+			}
+		break;
 		case DRIVE_TO_PEG: 
 			m_drive.straightPID(-.4);
-			if(m_drive.avgEncoderTicks() > aConstants.C_DIST_GEAR_PEG){
+			if(shoot && alliance.equalsIgnoreCase("blue")){
+				if(m_drive.avgEncoderTicks() > aConstants.C_DIST_GEAR_PEG-100){
+					m_drive.resetEncoders();
+					currentState = States.DRIVE_HALT;
+				}
+			} else if(m_drive.avgEncoderTicks() > aConstants.C_DIST_GEAR_PEG){
 				m_drive.resetEncoders();
 				currentState = States.DRIVE_HALT;
 			}

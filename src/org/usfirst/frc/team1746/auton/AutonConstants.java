@@ -13,6 +13,10 @@ public class AutonConstants {
 	double C_DIST_FROM_PEG = 150;
 	double C_DIST_CROSS_LINE = 900;
 	double C_DIST_CENTER = 1000;
+	double C_DIST_BACKUP = 125;
+	
+	double C_SHOOTER_RPM = 6243;
+	
 	
 	// Right Gear
 	double R_DIST_DRIVE = 457;

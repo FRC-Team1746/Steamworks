@@ -16,14 +16,22 @@ public class Loader {
 	public void init(){
 		loader = new Victor(electricalConstants.MOTOR_LOADER);
 	}
+	
+	public void set(double VBus){
+		loader.set(VBus);
+	}
+	
+	public void stop(){
+		loader.stopMotor();
+	}
 
 	public void checkControls(){
 		if(m_controls.operator_loader()){
-			loader.set(-.5);
+			set(-.5);
 		} else if(m_controls.operator_loader()){
-			loader.set(.5);
+			set(.5);
 		} else {
-			loader.set(0);
+			set(0);
 		}
 	}
 
