@@ -56,7 +56,7 @@ public class GearCenter {
 		switch(currentState){
 		case INIT: 
 			m_drive.resetEncoders();
-			currentState = States.SHOOT;
+			currentState = States.SHOOT_INIT;
 		break;
 		case SHOOT_INIT:
 			if(shoot){

@@ -50,6 +50,7 @@ public class AutonBase {
 	public void updateSmartDashboard(){
 		SmartDashboard.putString("Selected Alliance", selectedAlliance());
 		SmartDashboard.putString("Selected Auton", selectedAuton());
+		SmartDashboard.putString("Selected Shoot", selectedShoot());
 		SmartDashboard.putString("Current State", currentState());
 		if(SmartDashboard.getBoolean("Reset Auton", false)){
 			resetAll();
@@ -94,30 +95,24 @@ public class AutonBase {
 		return shootSelector.getSelected();
 	}
 	public String currentState(){
-		return "";
+		if(selectedAuton().equalsIgnoreCase("gear_r")) return gear_r.currentState();
+		if(selectedAuton().equalsIgnoreCase("gear_c")) return gear_c.currentState();
+		if(selectedAuton().equalsIgnoreCase("gear_l")) return gear_l.currentState();
+		else return "";
 	}
 	
 	public void run(){
 		m_gear.smartFlaps();
 		if(selectedAuton().equalsIgnoreCase("gear_r")){
-			SmartDashboard.putString("Auton State", gear_r.currentState());
 			gear_r.auton(selectedAlliance());
 		}
 		if(selectedAuton().equalsIgnoreCase("gear_c")){
-			SmartDashboard.putString("Auton State", gear_c.currentState());
 			gear_c.auton(selectedAlliance(), selectedShoot().equalsIgnoreCase("true"));
 		}
 		if(selectedAuton().equalsIgnoreCase("gear_l")){
-			SmartDashboard.putString("Auton State", gear_l.currentState());
 			gear_l.auton(selectedAlliance());
 		}
-	}
-	
-	public void resetAuton(){
-	}
-	
-	
-	
+	}	
 	
 	public void getCurrentState(){
 		

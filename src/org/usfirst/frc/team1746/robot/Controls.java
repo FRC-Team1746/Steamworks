@@ -130,4 +130,8 @@ public class Controls {
 		return xbox_operator.getPOV() == 135 || xbox_operator.getPOV() == 180 || xbox_operator.getPOV() == 225 ;
 	}
 /*********************************************************************************/
+
+	public boolean testPID(){
+		return xbox_driver.getRawButton(3);
+	}
 }

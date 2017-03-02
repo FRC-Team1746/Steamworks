@@ -78,11 +78,17 @@ public class Robot extends IterativeRobot {
 		conveyor.checkControls();
 		shooter.checkControls();
 		
+		if(controls.testPID()){
+			drive.straightPID(.4);
+		}
+		
 	}
 		
 	@Override
 	public void testPeriodic() {
-		shooter.setRPM("");
+		if(controls.operator_loader()){
+			
+		}
 	} 
 	
 	public void initSmartDashboard(){
