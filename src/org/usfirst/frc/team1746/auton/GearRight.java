@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1746.auton;
 
+import org.usfirst.frc.team1746.auton.GearLeft.States;
 import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
 
@@ -35,11 +36,14 @@ public class GearRight {
 		return currentState.name();
 	}
 	
-	public void resetState(){
+	public void reset(){
 		currentState = States.INIT;
+		m_drive.resetEncoders();
+		m_drive.resetSpeedPID();
+		loops = 0;
 	}
 	public void init(){
-		resetState();
+		reset();
 	}
 
 	public void auton(String alliance){
@@ -58,7 +62,7 @@ public class GearRight {
 		break;
 		case DRIVE_ROTATE_LEFT:
 			m_drive.rotate("Left");
-			if(m_drive.gyroAngle() > 60){
+			if(m_drive.gyroAngle() > 56){
 				m_drive.stop();
 				m_drive.resetEncoders();
 				currentState = States.DRIVE_TO_PEG;
@@ -66,7 +70,7 @@ public class GearRight {
 		break;
 		
 		case DRIVE_TO_PEG:
-			m_drive.straightPID(-.4);
+			m_drive.towardsPeg(-.35);;
 			if(m_drive.avgEncoderTicks() > aConstants.R_DIST_GEAR_PEG ){
 				m_drive.stop();
 				m_drive.resetEncoders();
@@ -75,6 +79,7 @@ public class GearRight {
 
 		break;
 		case WAIT_GEAR_REMOVAL:
+			m_drive.straight(-.275);;
 			if(m_gear.gearSensor()){
 				loops++;
 				if(loops > 50){

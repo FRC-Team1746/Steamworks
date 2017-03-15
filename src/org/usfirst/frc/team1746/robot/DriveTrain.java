@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1746.robot;
 
+import org.usfirst.frc.team1746.vision.VisionBase;
+
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
@@ -16,8 +18,10 @@ public class Drivetrain {
 	ElectricalConstants eConstants = new ElectricalConstants();
 	
 	private Controls m_controls;
-	public Drivetrain(Controls controls) {
+	private VisionBase m_vision;
+	public Drivetrain(Controls controls, VisionBase vision) {
 		m_controls = controls;
+		m_vision = vision;
 	}
 	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,6 +122,11 @@ public class Drivetrain {
 	public void stop(){
 		myRobot.stopMotor();
 	}
+	
+	public void resetSpeedPID(){
+		leftMotorSpeed = 0;
+	}
+	
 	public void straightPID(double desiredLeftMotorSpeed){
 		
 		double P = .02;
@@ -145,12 +154,25 @@ public class Drivetrain {
 	
 	public void rotate(String direction){
 		if(direction.equalsIgnoreCase("left")){		
-			myRobot.setLeftRightMotorOutputs(.35, -.35);
+			myRobot.setLeftRightMotorOutputs(.30, -.30);
 		} else if(direction.equalsIgnoreCase("right")){
-			myRobot.setLeftRightMotorOutputs(-.35, .35);
+			myRobot.setLeftRightMotorOutputs(-.30, .30);
 		}
+	}	
+	
+	double vision_P = .02/8;
+	double vision_speedLeft;
+	double vision_speedRight;
+	double vision_error;
+	
+	public void towardsPeg(double speedDesired){		
+		vision_error = m_vision.getError();
+		
+		vision_speedLeft = speedDesired  - (vision_P*vision_error)/2;
+		vision_speedRight = speedDesired + (vision_P*vision_error)/2;
+		
+		
+		myRobot.setLeftRightMotorOutputs(vision_speedLeft, vision_speedRight);
 	}
-	
-	
 	
 }

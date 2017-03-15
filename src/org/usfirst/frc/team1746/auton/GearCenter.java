@@ -30,7 +30,6 @@ public class GearCenter {
 		DRIVE_BACKUP,
 		ROTATE_PEG,
 		DRIVE_TO_PEG,
-		DRIVE_HALT,
 		WAIT_GEAR_REMOVAL,
 		DRIVE_FROM_PEG,
 		DRIVE_ROTATE,
@@ -46,82 +45,71 @@ public class GearCenter {
 		return currentState.name();
 	}
 	
-	public void resetState(){
+	public void reset(){
 		currentState = States.INIT;
+		loops = 0;
 	}
 	public void init(){
-		resetState();
+		reset();
 	}
-	public void auton(String alliance, boolean shoot){
+	public void auton(String alliance, boolean shoot, boolean wiggle){
 		switch(currentState){
 		case INIT: 
 			m_drive.resetEncoders();
-			currentState = States.SHOOT_INIT;
+			currentState = States.DRIVE_INIT; // change to shoot init
 		break;
-		case SHOOT_INIT:
-			if(shoot){
-				loops++;
-				m_shooter.setRPM(aConstants.C_SHOOTER_RPM);
-				if(loops > 50){
-					loops = 0;
-					currentState = States.SHOOT;
-				}
-			} else {
-				currentState = States.DRIVE_INIT;
-			}
-		break;
-		case SHOOT:
-			loops++;
-			m_loader.set(1);
-			if(loops > 300){
-				loops = 0;
-				m_loader.stop();
-				m_shooter.stop();
-				currentState = States.DRIVE_INIT;
-			}
-		break;
+//		case SHOOT_INIT:
+//			if(shoot){
+//				loops++;
+//				m_shooter.setRPM(aConstants.C_SHOOTER_RPM);
+//				if(loops > 50){
+//					loops = 0;
+//					currentState = States.SHOOT;
+//				}
+//			} else {
+//				currentState = States.DRIVE_INIT;
+//			}
+//		break;
+//		case SHOOT:
+//			loops++;
+//			m_loader.set(1);
+//			if(loops > 300){
+//				loops = 0;
+//				m_loader.stop();
+//				m_shooter.stop();
+//				currentState = States.DRIVE_INIT;
+//			}
+//		break;
 		case DRIVE_INIT:
 			m_drive.resetEncoders();
-			if(alliance.equalsIgnoreCase("blue")){
-				currentState = States.DRIVE_BACKUP;
-			} else {
-				currentState = States.DRIVE_TO_PEG;
-			}
+			m_drive.resetSpeedPID();
+			currentState = States.DRIVE_TO_PEG;
 		break;
-		case DRIVE_BACKUP:
-			m_drive.straightPID(.4);
-			if(m_drive.avgEncoderTicks() > aConstants.C_DIST_BACKUP){
-				m_drive.stop();
-				m_drive.resetEncoders();
-				currentState = States.ROTATE_PEG;
-			}
-		break;
-		case ROTATE_PEG:
-			m_drive.rotate("left");
-			if(m_drive.gyroAngle() > 175){
-				m_drive.stop();
-				m_drive.resetEncoders();
-				currentState = States.DRIVE_TO_PEG;
-			}
-		break;
+//		case DRIVE_BACKUP:
+//			m_drive.straightPID(.4);
+//			if(m_drive.avgEncoderTicks() > aConstants.C_DIST_BACKUP){
+//				m_drive.stop();
+//				m_drive.resetEncoders();
+//				currentState = States.ROTATE_PEG;
+//			}
+//		break;
+//		case ROTATE_PEG:
+//			m_drive.rotate("left");
+//			if(m_drive.gyroAngle() > 175){
+//				m_drive.stop();
+//				m_drive.resetEncoders();
+//				currentState = States.DRIVE_TO_PEG;
+//			}
+//		break;
 		case DRIVE_TO_PEG: 
-			m_drive.straightPID(-.4);
-			if(shoot && alliance.equalsIgnoreCase("blue")){
-				if(m_drive.avgEncoderTicks() > aConstants.C_DIST_GEAR_PEG-100){
-					m_drive.resetEncoders();
-					currentState = States.DRIVE_HALT;
-				}
-			} else if(m_drive.avgEncoderTicks() > aConstants.C_DIST_GEAR_PEG){
+			m_drive.towardsPeg(-.35);
+			if(m_drive.avgEncoderTicks() > aConstants.C_DIST_GEAR_PEG){
 				m_drive.resetEncoders();
-				currentState = States.DRIVE_HALT;
+				currentState = States.WAIT_GEAR_REMOVAL;
 			}
-		break;
-		case DRIVE_HALT:
-			m_drive.straightPID(-.15);
-			currentState = States.WAIT_GEAR_REMOVAL;
-		break;
-		
+		break;	
 		case WAIT_GEAR_REMOVAL: 
+			m_drive.straight(-.275);
 			if(m_gear.gearSensor()){
 				loops++;
 				if(loops > 100){
@@ -130,7 +118,6 @@ public class GearCenter {
 					currentState = States.DRIVE_FROM_PEG;
 				}
 			}
-			
 		break;
 		case DRIVE_FROM_PEG: 
 			m_drive.straight(.4);

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class AutonBase {
 	SendableChooser<String> autonSelector = new SendableChooser<>();
 	SendableChooser<String> allianceSelector = new SendableChooser<>();
-	SendableChooser<String> shootSelector = new SendableChooser<>();
+	SendableChooser<Boolean> shootSelector = new SendableChooser<>();
 	
 	private Drivetrain m_drive;
 	private GearIntake m_gear;
@@ -26,6 +26,7 @@ public class AutonBase {
 	}
 	
 	AutonConstants aConstants = new AutonConstants();
+	
 	GearLeft gear_l;
 	GearCenter gear_c;
 	GearRight gear_r;
@@ -50,7 +51,7 @@ public class AutonBase {
 	public void updateSmartDashboard(){
 		SmartDashboard.putString("Selected Alliance", selectedAlliance());
 		SmartDashboard.putString("Selected Auton", selectedAuton());
-		SmartDashboard.putString("Selected Shoot", selectedShoot());
+		SmartDashboard.putBoolean("Selected Shoot", selectedShoot());
 		SmartDashboard.putString("Current State", currentState());
 		if(SmartDashboard.getBoolean("Reset Auton", false)){
 			resetAll();
@@ -71,14 +72,14 @@ public class AutonBase {
 		SmartDashboard.putData("Auton Selector", autonSelector);
 	}
 	public void initShootSelector(){
-		shootSelector.addDefault("Yes", "true");
-		shootSelector.addObject("No", "false");
+		shootSelector.addDefault("No", false);
+		shootSelector.addObject("Yes", true);
 		SmartDashboard.putData("Shooter", shootSelector);
 	}
 	public void resetAll(){
-		gear_r.resetState();
-		gear_c.resetState();
-		gear_l.resetState();
+		gear_r.reset();
+		gear_c.reset();
+		gear_l.reset();
 		
 
 		m_drive.resetEncoders();
@@ -91,7 +92,7 @@ public class AutonBase {
 	public String selectedAlliance(){
 		return allianceSelector.getSelected();
 	}
-	public String selectedShoot(){
+	public boolean selectedShoot(){
 		return shootSelector.getSelected();
 	}
 	public String currentState(){
@@ -107,7 +108,7 @@ public class AutonBase {
 			gear_r.auton(selectedAlliance());
 		}
 		if(selectedAuton().equalsIgnoreCase("gear_c")){
-			gear_c.auton(selectedAlliance(), selectedShoot().equalsIgnoreCase("true"));
+			gear_c.auton(selectedAlliance(), selectedShoot(), false);
 		}
 		if(selectedAuton().equalsIgnoreCase("gear_l")){
 			gear_l.auton(selectedAlliance());

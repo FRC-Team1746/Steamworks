@@ -36,11 +36,14 @@ public class GearLeft {
 		return currentState.name();
 	}
 	
-	public void resetState(){
+	public void reset(){
 		currentState = States.INIT;
+		m_drive.resetSpeedPID();
+		m_drive.resetEncoders();
+		loops = 0;
 	}
 	public void init(){
-		resetState();
+		reset();
 	}
 	public void auton(String alliance){
 		switch(currentState){
@@ -58,25 +61,22 @@ public class GearLeft {
 		break;
 		case DRIVE_ROTATE_RIGHT:
 			m_drive.rotate("right");
-			if(m_drive.gyroAngle() < -60){
+			if(m_drive.gyroAngle() < -56){
 				m_drive.stop();
 				m_drive.resetEncoders();
 				currentState = States.DRIVE_TO_PEG;
 			}
 		break;
 		case DRIVE_TO_PEG:
-			m_drive.straightPID(-.4);
+			m_drive.towardsPeg(-.35);
 			if(m_drive.avgEncoderTicks() > aConstants.L_DIST_GEAR_PEG ){
+				m_drive.stop();
 				m_drive.resetEncoders();
-				currentState = States.DRIVE_STALL;
 			}
-			
-		break;
-		case DRIVE_STALL:
-			m_drive.straightPID(-.15);
 			currentState = States.WAIT_GEAR_REMOVAL;
 		break;
 		case WAIT_GEAR_REMOVAL:
+			m_drive.straight(-.275);
 			if(m_gear.gearSensor()){
 				loops++;
 				if(loops > 100){
@@ -100,6 +100,7 @@ public class GearLeft {
 			if(m_drive.gyroAngle() > 0){
 				m_drive.stop();
 				m_drive.resetEncoders();
+				m_drive.resetSpeedPID();
 				currentState = States.DRIVE_AWAY;
 			}
 		break;
@@ -107,7 +108,7 @@ public class GearLeft {
 			// Red Alliance
 			if(alliance.equals("red")){
 				m_drive.straightPID(-.7);
-				if(m_drive.avgEncoderTicks() > aConstants.L_DIST_CENTER){
+				if(m_drive.avgEncoderTicks() > aConstants.L_DIST_AWAY){
 					m_drive.stop();
 					m_drive.resetEncoders();
 					currentState = States.WAIT_TELEOP;
@@ -116,7 +117,7 @@ public class GearLeft {
 			//Blue Alliance
 			if(alliance.equals("blue")){
 				m_drive.straightPID(-.5);
-				if(m_drive.avgEncoderTicks() > aConstants.L_DIST_CENTER){
+				if(m_drive.avgEncoderTicks() > aConstants.L_DIST_AWAY){
 					m_drive.stop();
 					m_drive.resetEncoders();
 					currentState = States.ROTATE_GEAR_LOAD;

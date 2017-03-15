@@ -131,7 +131,7 @@ public class Controls {
 	}
 /*********************************************************************************/
 
-	public boolean testPID(){
+	public boolean testButton(){
 		return xbox_driver.getRawButton(3);
 	}
 }

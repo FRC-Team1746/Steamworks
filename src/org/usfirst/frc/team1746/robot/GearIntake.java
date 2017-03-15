@@ -36,7 +36,6 @@ public class GearIntake {
 		LEDLeft = new Solenoid(eConstants.GEAR_LED_LEFT);
 		LEDRight = new Solenoid(eConstants.GEAR_LED_RIGHT);
 		beambreak = new DigitalInput(eConstants.DIFFUSE_GEAR);
-		
 		flapsIn();
 	}
 	
@@ -86,6 +85,15 @@ public class GearIntake {
 	boolean prevControlOut = false;
 	boolean prevControlIn = false;
 	int loops = 0;
+	
+	public void leds(){
+		if(!beambreak.get()){
+			LEDsOn();
+		}
+		if(beambreak.get()){
+			LEDsOff();
+		}
+	}
 	public void smartFlaps(){
 			// Controls: Flaps In
 			if((m_controls.driver_gearFlapsIn() || m_controls.operator_gearFlapsIn()) && !prevControlIn){ //controllers says go in

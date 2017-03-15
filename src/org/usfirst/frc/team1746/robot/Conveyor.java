@@ -19,7 +19,7 @@ public class Conveyor {
 	
 	public void checkControls(){
 		if(m_controls.operator_conveyor_shooter()){
-			conveyor.set(-1);
+			conveyor.set(1);
 		} else {
 			conveyor.set(0);
 		}

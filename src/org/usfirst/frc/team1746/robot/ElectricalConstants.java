@@ -19,16 +19,16 @@ public class ElectricalConstants {
 	int MOTOR_TURRET = 9;
 	
 	// MoreBoard
-	int mb0 = 0;
-	int mb1 = 1;
-	int mb2 = 2;
-	int mb3 = 3;
-	int mb4 = 4;
-	int mb5 = 5;
-	int mb6 = 6;
-	int mb7 = 7;
-	int mb8 = 8;
-	int mb9 = 9;
+	public int VISION_LED_ERROR_0 = 10;
+	public int VISION_LED_ERROR_1 = 11;
+	public int VISION_LED_ERROR_2 = 12;
+	public int VISION_LED_ERROR_3 = 13;
+	public int VISION_LED_ERROR_4 = 14;
+	public int VISION_LED_SIGN = 15;
+	public int VISION_LED_GEAR = 16;
+	public int mb7 = 17;
+	public int mb8 = 18;
+	public int mb9 = 19;
 	
 	
 	// DIOs

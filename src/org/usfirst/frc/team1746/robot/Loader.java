@@ -27,8 +27,6 @@ public class Loader {
 
 	public void checkControls(){
 		if(m_controls.operator_loader()){
-			set(-.5);
-		} else if(m_controls.operator_loader()){
 			set(.5);
 		} else {
 			set(0);

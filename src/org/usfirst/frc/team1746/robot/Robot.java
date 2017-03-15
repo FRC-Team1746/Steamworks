@@ -1,11 +1,15 @@
 package org.usfirst.frc.team1746.robot;
 
 import org.usfirst.frc.team1746.auton.AutonBase;
+import org.usfirst.frc.team1746.vision.VisionBase;
+import org.usfirst.frc.team1746.vision.VisionTargeting;
 
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 
 public class Robot extends IterativeRobot {
-	Vision vision;
+	VisionBase vision;
+	//VisionTargeting trackingLEDs;
 	Controls controls;
 	Drivetrain drive;
 	Climber climber;
@@ -17,21 +21,27 @@ public class Robot extends IterativeRobot {
 	
 	AutonBase auton;
 	
+	
+	DigitalOutput test;
 	@Override
 	public void robotInit() {
 		controls = new Controls();
-		vision = new Vision();
-		drive = new Drivetrain(controls);
+		vision = new VisionBase();
+		drive = new Drivetrain(controls, vision);
 		climber = new Climber(controls); 
 		gear = new GearIntake(controls);
+		//trackingLEDs = new VisionTargeting(vision, gear);
 		intake = new Intake(controls);
 		loader = new Loader(controls);
 		shooter = new Shooter(controls);
 		conveyor = new Conveyor(controls);
 		auton = new AutonBase(drive, gear, loader, shooter);
+		
+		test = new DigitalOutput(11);
 		shooter.init();
 		controls.init();
 		vision.init();
+		//trackingLEDs.init();
 		drive.init();
 		auton.init();
 		controls.init();
@@ -49,12 +59,18 @@ public class Robot extends IterativeRobot {
 		//auton.init()'
 	}
 	public void disabledPeriodic(){
+		vision.trackObject();
+		//trackingLEDs.run();
 		updateSmartDashboard();
+		//test.set(true);
+		
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		auton.run();
+		vision.trackObject();
+		//trackingLEDs.run();
 		updateSmartDashboard();
 	}
 
@@ -62,7 +78,8 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		updateSmartDashboard();
 		
-		vision.printPixyStuff();
+		vision.trackObject();
+		//trackingLEDs.run();
 		
 		drive.teleopArcadeDrive();
 		
@@ -72,14 +89,14 @@ public class Robot extends IterativeRobot {
 		
 		loader.checkControls();
 		
-		gear.smartFlaps();
+		gear.smartFlaps();;
 		
 		
 		conveyor.checkControls();
 		shooter.checkControls();
 		
-		if(controls.testPID()){
-			drive.straightPID(.4);
+		if(controls.testButton()){
+			drive.towardsPeg(-.35);;
 		}
 		
 	}
@@ -102,6 +119,8 @@ public class Robot extends IterativeRobot {
 		auton.updateSmartDashboard();
 		gear.updateSmartDashboard();
 		shooter.updateSmartDashboard();
+		vision.updateSmartdashboard();
+		//trackingLEDs.updateSmartDashboard();
 	}
 }
 
