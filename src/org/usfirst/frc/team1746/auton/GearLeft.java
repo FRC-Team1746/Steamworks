@@ -72,8 +72,8 @@ public class GearLeft {
 			if(m_drive.avgEncoderTicks() > aConstants.L_DIST_GEAR_PEG ){
 				m_drive.stop();
 				m_drive.resetEncoders();
+				currentState = States.WAIT_GEAR_REMOVAL;
 			}
-			currentState = States.WAIT_GEAR_REMOVAL;
 		break;
 		case WAIT_GEAR_REMOVAL:
 			m_drive.straight(-.275);
