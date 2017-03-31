@@ -18,9 +18,9 @@ public class Climber {
 	
 	
 	public void checkControls(){
-		if(m_controls.operator_climberUp()){
+		if(m_controls.operator_climberUp() || m_controls.driver_climberUp()){
 			climber.set(1);
-		} else if(m_controls.operator_climberDown()){
+		} else if(m_controls.operator_climberDown() || m_controls.driver_climberDown()){
 			climber.set(-1);
 		} else {
 			climber.set(0);

@@ -21,6 +21,9 @@ public class Loader {
 		loader.set(VBus);
 	}
 	
+	public void test(){
+	}
+	
 	public void stop(){
 		loader.stopMotor();
 	}

@@ -1,9 +1,11 @@
 package org.usfirst.frc.team1746.auton;
 
+import org.usfirst.frc.team1746.robot.Conveyor;
 import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
 import org.usfirst.frc.team1746.robot.Loader;
 import org.usfirst.frc.team1746.robot.Shooter;
+import org.usfirst.frc.team1746.vision.VisionBase;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,12 +19,16 @@ public class AutonBase {
 	private GearIntake m_gear;
 	private Loader m_loader;
 	private Shooter m_shooter;
+	private Conveyor m_conveyor;
+	private VisionBase m_vision;
 	
-	public AutonBase(Drivetrain drive, GearIntake gear, Loader loader, Shooter shooter){
+	public AutonBase(Drivetrain drive, GearIntake gear, Loader loader, Shooter shooter, Conveyor conveyor, VisionBase vision){
 		m_drive = drive;
 		m_gear = gear;
 		m_loader = loader;
 		m_shooter = shooter;
+		m_conveyor = conveyor;
+		m_vision = vision;
 	}
 	
 	AutonConstants aConstants = new AutonConstants();
@@ -34,9 +40,9 @@ public class AutonBase {
 	int loops = 0;
 	
 	public void init(){
-		gear_l = new GearLeft(m_drive, m_gear);
-		gear_c = new GearCenter(m_drive, m_gear, m_loader, m_shooter);
-		gear_r = new GearRight(m_drive, m_gear);
+		gear_l = new GearLeft(m_drive, m_gear, m_loader, m_shooter, m_conveyor);
+		gear_c = new GearCenter(m_drive, m_gear, m_loader, m_shooter, m_conveyor);
+		gear_r = new GearRight(m_drive, m_gear, m_vision);
 		
 		gear_l.init();
 		gear_c.init();
@@ -105,13 +111,13 @@ public class AutonBase {
 	public void run(){
 		m_gear.smartFlaps();
 		if(selectedAuton().equalsIgnoreCase("gear_r")){
-			gear_r.auton(selectedAlliance());
+			gear_r.auton(selectedAlliance(), selectedShoot());
 		}
 		if(selectedAuton().equalsIgnoreCase("gear_c")){
 			gear_c.auton(selectedAlliance(), selectedShoot(), false);
 		}
 		if(selectedAuton().equalsIgnoreCase("gear_l")){
-			gear_l.auton(selectedAlliance());
+			gear_l.auton(selectedAlliance(), selectedShoot());
 		}
 	}	
 	

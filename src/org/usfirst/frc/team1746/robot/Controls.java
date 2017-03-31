@@ -89,8 +89,23 @@ public class Controls {
 	public boolean driver_allign(int degree){
 		return xbox_driver.getPOV() == degree;
 	}
+	public boolean driver_climberUp(){
+		return xbox_driver.getPOV() == 315 || xbox_driver.getPOV() == 0 || xbox_driver.getPOV() == 45 ;
+	}
+	public boolean driver_climberDown(){
+		return xbox_driver.getPOV() == 135 || xbox_driver.getPOV() == 180 || xbox_driver.getPOV() == 225 ;
+	}
 /*********************************************************************************/
 // Operator	
+	// Hopper Flap Control
+	
+	public boolean operator_gearHopperOut(){
+		return xbox_operator.getRawButton(1);
+	}
+	public boolean operator_gearHopperIn(){
+	return xbox_operator.getRawButton(3);
+	}
+	
 	// Gear Flap Control
 	public boolean operator_gearFlapsOut(){
 		return xbox_operator.getRawButton(5);
@@ -129,9 +144,16 @@ public class Controls {
 	public boolean operator_climberDown(){
 		return xbox_operator.getPOV() == 135 || xbox_operator.getPOV() == 180 || xbox_operator.getPOV() == 225 ;
 	}
+	
+	
 /*********************************************************************************/
 
 	public boolean testButton(){
 		return xbox_driver.getRawButton(3);
 	}
+	
+	public double testShooter(){
+		return xbox_driver.getRawAxis(1);
+	}
+	
 }

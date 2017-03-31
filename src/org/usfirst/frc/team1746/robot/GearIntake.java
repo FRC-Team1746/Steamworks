@@ -23,8 +23,12 @@ public class GearIntake {
 
 	Solenoid flapsOut;
 	Solenoid flapsIn;
+	Solenoid hopperFlapsOut;
+	Solenoid hopperFlapsIn;
 	Solenoid LEDLeft;
 	Solenoid LEDRight;
+	
+	
 	DigitalInput beambreak;
 	
 	boolean lastBB;
@@ -35,6 +39,8 @@ public class GearIntake {
 		flapsIn = new Solenoid(eConstants.GEAR_FLAPS_IN);
 		LEDLeft = new Solenoid(eConstants.GEAR_LED_LEFT);
 		LEDRight = new Solenoid(eConstants.GEAR_LED_RIGHT);
+		hopperFlapsOut = new Solenoid(eConstants.GEAR_HOPPER_FLAPS_OUT);
+		hopperFlapsIn = new Solenoid(eConstants.GEAR_HOPPER_FLAPS_IN);
 		beambreak = new DigitalInput(eConstants.DIFFUSE_GEAR);
 		flapsIn();
 	}
@@ -47,7 +53,7 @@ public class GearIntake {
 		
 	}
 	public void updateSmartDashboard(){
-		SmartDashboard.putBoolean("Gear Sensor", beambreak.get());
+		SmartDashboard.putBoolean("Gear Sensor", gearSensor());
 	}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///// GearIntake functions
@@ -63,6 +69,14 @@ public class GearIntake {
 	public void flapsIn(){
 		flapsOut.set(false);
 		flapsIn.set(true);
+	}
+	public void hopperFlapsOut(){
+		hopperFlapsIn.set(false);
+		hopperFlapsOut.set(true);
+	}
+	public void hopperFlapsIn(){
+		hopperFlapsOut.set(false);
+		hopperFlapsIn.set(true);
 	}
 	public void LEDsOn(){
 		LEDLeft.set(true);
@@ -130,10 +144,17 @@ public class GearIntake {
 	
 	// Not Used
 	public void checkControls(){
-		if(m_controls.operator_gearFlapsOut() || m_controls.driver_gearFlapsOut()){
-			flapsOut();
-		} else if(m_controls.operator_gearFlapsIn() || m_controls.driver_gearFlapsIn()){
-			flapsIn();
+//		if(m_controls.operator_gearFlapsOut() || m_controls.driver_gearFlapsOut()){
+//			flapsOut();
+//		} else if(m_controls.operator_gearFlapsIn() || m_controls.driver_gearFlapsIn()){
+//			flapsIn();
+		/*} else*/ 
+		if(m_controls.operator_gearHopperIn()){
+			hopperFlapsIn();
+			
+		} else if(m_controls.operator_gearHopperOut()){
+			hopperFlapsOut();
 		}
 	}
+	
 }

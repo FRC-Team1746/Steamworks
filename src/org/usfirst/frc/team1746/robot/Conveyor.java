@@ -16,10 +16,13 @@ public class Conveyor {
 		conveyor = new Victor(eConstants.MOTOR_CONVEYOR);
 	}
 	
+	public void sets(int value){
+		conveyor.set(value);
+	}
 	
 	public void checkControls(){
 		if(m_controls.operator_conveyor_shooter()){
-			conveyor.set(1);
+			conveyor.set(-1);
 		} else {
 			conveyor.set(0);
 		}

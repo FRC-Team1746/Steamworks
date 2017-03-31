@@ -1,11 +1,9 @@
 package org.usfirst.frc.team1746.vision;
 
 import edu.wpi.first.wpilibj.I2C;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class VisionBase {
-	
+public class VisionBoiler {
 	I2C pixyCam;
 	//DigitalOutput VisionTiming;
 	//DigitalOutput PixyReadTiming;
@@ -41,7 +39,7 @@ public class VisionBase {
 	
 	
     public void init() {
-    	pixyCam = new I2C(I2C.Port.kOnboard, 0x54);
+    	pixyCam = new I2C(I2C.Port.kOnboard, 0xab);
     			//VisionTiming = new DigitalOutput(0);
     			//PixyReadTiming = new DigitalOutput(1);
 
@@ -177,7 +175,7 @@ public class VisionBase {
       		height2 = (char) 0;
       	}
       	// Find right most target
-      	if(xPos1 > xPos2)
+      	if(yPos1 > yPos2)
       	{
       		Target_X = xPos1;
       		Target_H = height1;
@@ -199,30 +197,30 @@ public class VisionBase {
     	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     	///// print values 
     	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    	SmartDashboard.putNumber("Target_X", Target_X);
-    	SmartDashboard.putNumber("Target_Y", Target_Y);
-    	SmartDashboard.putNumber("Target_W", Target_W);
-    	SmartDashboard.putNumber("Target_H", Target_H);
-    	SmartDashboard.putNumber("Target_error", getError());
-    	SmartDashboard.putNumber("numTargets: ", numTargets);
+    	SmartDashboard.putNumber("bTarget_X", Target_X);
+    	SmartDashboard.putNumber("bTarget_Y", Target_Y);
+    	SmartDashboard.putNumber("bTarget_W", Target_W);
+    	SmartDashboard.putNumber("bTarget_H", Target_H);
+    	SmartDashboard.putNumber("bTarget_error", getError());
+    	SmartDashboard.putNumber("bnumTargets: ", numTargets);
 
-    	SmartDashboard.putNumber("signature", signature);
-    	SmartDashboard.putNumber("xPos1", xPos1);
-    	SmartDashboard.putNumber("xPos2", xPos2);
-    	SmartDashboard.putNumber("yPos1", yPos1);
-    	SmartDashboard.putNumber("yPos2", yPos2);
-    	SmartDashboard.putNumber("width1", width1);
-    	SmartDashboard.putNumber("height", height1);
-    	SmartDashboard.putNumber("width2", width2);
-    	SmartDashboard.putNumber("height", height2);
+    	SmartDashboard.putNumber("bsignature", signature);
+    	SmartDashboard.putNumber("bxPos1", xPos1);
+    	SmartDashboard.putNumber("bxPos2", xPos2);
+    	SmartDashboard.putNumber("byPos1", yPos1);
+    	SmartDashboard.putNumber("byPos2", yPos2);
+    	SmartDashboard.putNumber("bwidth1", width1);
+    	SmartDashboard.putNumber("bheight", height1);
+    	SmartDashboard.putNumber("bwidth2", width2);
+    	SmartDashboard.putNumber("bheight", height2);
 
 
-    	SmartDashboard.putBoolean("foundBothTargets", foundBothTargets);
-    	SmartDashboard.putBoolean("checkSumAValid", checkSumAValid);
-    	SmartDashboard.putBoolean("checkSumBValid", checkSumBValid);
-    	SmartDashboard.putBoolean("sigAValid", sigAValid);
-    	SmartDashboard.putBoolean("sigBValid", sigAValid);
-    	SmartDashboard.putBoolean("frameFound", frameFound);
+    	SmartDashboard.putBoolean("bfoundBothTargets", foundBothTargets);
+    	SmartDashboard.putBoolean("bcheckSumAValid", checkSumAValid);
+    	SmartDashboard.putBoolean("bcheckSumBValid", checkSumBValid);
+    	SmartDashboard.putBoolean("bsigAValid", sigAValid);
+    	SmartDashboard.putBoolean("bsigBValid", sigAValid);
+    	SmartDashboard.putBoolean("bframeFound", frameFound);
     }
 
     public int getError(){
@@ -236,5 +234,4 @@ public class VisionBase {
 	public int getNumTargets() {
 		return numTargets;
 	}
-    
 }

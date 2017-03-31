@@ -6,7 +6,15 @@ import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
-	CANTalon shooter;
+	
+	// RS 775 Pro : 18730 rpm
+	// 3:1 Gearing
+	// 6243 rpm
+	
+	
+	
+	CANTalon shooterMaster;
+	CANTalon shooterSlave;
 	
 	private Controls m_controls;
 	
@@ -15,42 +23,74 @@ public class Shooter {
 	}
 		
 	public void init(){
-		shooter = new CANTalon(9);
+		shooterMaster = new CANTalon(9);
+		shooterSlave = new CANTalon(10);
 		
-		shooter.enableBrakeMode(false);
-		shooter.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
-		shooter.setProfile(0);
-		shooter.setF(0.1);
-		shooter.setP(0);
-		shooter.setI(0);
-		shooter.setD(0);		
+		shooterMaster.enableBrakeMode(false);
+		shooterSlave.enableBrakeMode(false);
+		
+		shooterMaster.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+		
+		shooterMaster.configNominalOutputVoltage(+0.0f, -0.0f);
+		shooterSlave.configNominalOutputVoltage(+0.0f, -0.0f);
+		
+		shooterMaster.changeControlMode(TalonControlMode.PercentVbus);
+		shooterSlave.changeControlMode(TalonControlMode.Follower);
+		
+		shooterSlave.set(9);
+		
+		shooterMaster.setProfile(0);
+		shooterMaster.setF(0.03);
+		shooterMaster.setP(0.07);
+		shooterMaster.setI(0);
+		shooterMaster.setD(0);		
 	}
 	public void initSmartDashboard(){
 		
 	}
 	
 	public void updateSmartDashboard(){
-		SmartDashboard.putNumber("Shooter Speed", getSpeed());
+		SmartDashboard.putNumber("Shooter: Speed", getSpeed());
+		SmartDashboard.putNumber("Shooter: EncPosition", getEncPosition());
+		SmartDashboard.putNumber("Shooter: EncVelocity", getEncVelocity());
+		SmartDashboard.putNumber("Shooter: TargetSpeed", targetSpeed);
 	}
 	
+	double targetSpeed;
+	
 	public void stop(){
-		shooter.changeControlMode(TalonControlMode.PercentVbus);
-		shooter.set(0);
+		shooterMaster.changeControlMode(TalonControlMode.PercentVbus);
+		shooterMaster.set(0);
 	}
 	
 	
 	public void setRPM(double rpm){
-		shooter.changeControlMode(TalonControlMode.Speed);
-		shooter.set(rpm);
+		targetSpeed = rpm;
+		shooterMaster.changeControlMode(TalonControlMode.Speed);
+		shooterMaster.set(rpm);
+	}
+	
+	public void set(double voltage){
+		
+		shooterMaster.changeControlMode(TalonControlMode.PercentVbus);
+		shooterMaster.set(voltage);
 	}
 	
 	public double getSpeed(){
-		return shooter.getSpeed();
+		return shooterMaster.getSpeed();
+	}
+	
+	public double getEncPosition(){
+		return shooterMaster.getEncPosition();
+	}
+	
+	public double getEncVelocity(){
+		return shooterMaster.getEncVelocity();
 	}
 	
 	public void checkControls(){
 		if(m_controls.operator_conveyor_shooter()){
-			setRPM(6243);
+			setRPM(-3000);
 		} else {
 			stop();
 		}

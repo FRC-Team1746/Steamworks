@@ -62,7 +62,8 @@ public class Drivetrain {
 	
 	public void teleopArcadeDrive(){
 		myRobot.arcadeDrive(m_controls.xbox_driver);
-	}
+	}	
+	
 	public void teleopTankDrive(){
 		myRobot.tankDrive(m_controls.xbox_driver, m_controls.driver_leftAxis(), m_controls.xbox_driver, m_controls.driver_rightAxis());
 	}
@@ -160,7 +161,7 @@ public class Drivetrain {
 		}
 	}	
 	
-	double vision_P = .02/8;
+	double vision_P = .0035;
 	double vision_speedLeft;
 	double vision_speedRight;
 	double vision_error;
@@ -173,6 +174,10 @@ public class Drivetrain {
 		
 		
 		myRobot.setLeftRightMotorOutputs(vision_speedLeft, vision_speedRight);
+	}
+	
+	public void set(double left, double right){
+		myRobot.setLeftRightMotorOutputs(left, right);
 	}
 	
 }

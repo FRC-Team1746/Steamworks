@@ -1,14 +1,17 @@
 package org.usfirst.frc.team1746.robot;
 
 import org.usfirst.frc.team1746.auton.AutonBase;
+import org.usfirst.frc.team1746.vision.RGB_LEDs;
 import org.usfirst.frc.team1746.vision.VisionBase;
-import org.usfirst.frc.team1746.vision.VisionTargeting;
+import org.usfirst.frc.team1746.vision.VisionBoiler;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 	VisionBase vision;
+	VisionBoiler vision_boiler;
 	//VisionTargeting trackingLEDs;
 	Controls controls;
 	Drivetrain drive;
@@ -18,7 +21,7 @@ public class Robot extends IterativeRobot {
 	Loader loader;
 	Conveyor conveyor;
 	Shooter shooter;
-	
+	RGB_LEDs rgb_leds;
 	AutonBase auton;
 	
 	
@@ -27,6 +30,7 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		controls = new Controls();
 		vision = new VisionBase();
+		vision_boiler = new VisionBoiler();
 		drive = new Drivetrain(controls, vision);
 		climber = new Climber(controls); 
 		gear = new GearIntake(controls);
@@ -35,13 +39,17 @@ public class Robot extends IterativeRobot {
 		loader = new Loader(controls);
 		shooter = new Shooter(controls);
 		conveyor = new Conveyor(controls);
-		auton = new AutonBase(drive, gear, loader, shooter);
+		auton = new AutonBase(drive, gear, loader, shooter, conveyor, vision);
+		rgb_leds = new RGB_LEDs(vision, gear);
 		
 		test = new DigitalOutput(11);
 		shooter.init();
 		controls.init();
+		
 		vision.init();
-		//trackingLEDs.init();
+		vision_boiler.init();
+		
+		rgb_leds.init();
 		drive.init();
 		auton.init();
 		controls.init();
@@ -60,7 +68,9 @@ public class Robot extends IterativeRobot {
 	}
 	public void disabledPeriodic(){
 		vision.trackObject();
+		vision_boiler.trackObject();
 		//trackingLEDs.run();
+		rgb_leds.update();
 		updateSmartDashboard();
 		//test.set(true);
 		
@@ -70,8 +80,9 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		auton.run();
 		vision.trackObject();
-		//trackingLEDs.run();
+		rgb_leds.update();
 		updateSmartDashboard();
+		
 	}
 
 	@Override
@@ -79,7 +90,6 @@ public class Robot extends IterativeRobot {
 		updateSmartDashboard();
 		
 		vision.trackObject();
-		//trackingLEDs.run();
 		
 		drive.teleopArcadeDrive();
 		
@@ -89,15 +99,22 @@ public class Robot extends IterativeRobot {
 		
 		loader.checkControls();
 		
-		gear.smartFlaps();;
+		gear.checkControls();
+		gear.smartFlaps();
+		gear.leds();
 		
+		rgb_leds.update();
 		
 		conveyor.checkControls();
 		shooter.checkControls();
 		
 		if(controls.testButton()){
-			drive.towardsPeg(-.35);;
+			shooter.setRPM(-2000);
 		}
+		
+		
+		
+		
 		
 	}
 		
@@ -111,8 +128,7 @@ public class Robot extends IterativeRobot {
 	public void initSmartDashboard(){
 		auton.initSmartDashboard();
 		drive.initSmartDashboard();
-		shooter.initSmartDashboard();
-	}
+		shooter.initSmartDashboard();	}
 	
 	public void updateSmartDashboard(){
 		drive.updateSmartDashboard();
@@ -120,7 +136,7 @@ public class Robot extends IterativeRobot {
 		gear.updateSmartDashboard();
 		shooter.updateSmartDashboard();
 		vision.updateSmartdashboard();
-		//trackingLEDs.updateSmartDashboard();
+		vision_boiler.updateSmartdashboard();
 	}
 }
 
