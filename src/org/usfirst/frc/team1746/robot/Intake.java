@@ -18,9 +18,9 @@ public class Intake {
 		
 	}
 	public void checkControls(){
-		if(m_controls.driver_intakeBalls()){
+		if(m_controls.driver_intakeBalls() || m_controls.operator_intakeBalls()){
 			intake.set(1);
-		} else if(m_controls.driver_outtakeBalls()){
+		} else if(m_controls.driver_outtakeBalls() || m_controls.operator_outtakeBalls()){
 			intake.set(-1);
 		} else {
 			intake.set(0);

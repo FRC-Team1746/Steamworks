@@ -98,13 +98,18 @@ public class Controls {
 /*********************************************************************************/
 // Operator	
 	// Hopper Flap Control
-	
-	public boolean operator_gearHopperOut(){
+	public boolean operator_intakeBalls(){
+		return xbox_operator.getRawButton(1);
+	}
+	public boolean operator_outtakeBalls(){
+		return xbox_operator.getRawButton(2);
+	}
+	/*public boolean operator_gearHopperOut(){
 		return xbox_operator.getRawButton(1);
 	}
 	public boolean operator_gearHopperIn(){
 	return xbox_operator.getRawButton(3);
-	}
+	}*/
 	
 	// Gear Flap Control
 	public boolean operator_gearFlapsOut(){

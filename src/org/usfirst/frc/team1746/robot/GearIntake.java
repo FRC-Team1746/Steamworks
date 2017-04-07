@@ -149,12 +149,7 @@ public class GearIntake {
 //		} else if(m_controls.operator_gearFlapsIn() || m_controls.driver_gearFlapsIn()){
 //			flapsIn();
 		/*} else*/ 
-		if(m_controls.operator_gearHopperIn()){
-			hopperFlapsIn();
-			
-		} else if(m_controls.operator_gearHopperOut()){
-			hopperFlapsOut();
-		}
+		
 	}
 	
 }

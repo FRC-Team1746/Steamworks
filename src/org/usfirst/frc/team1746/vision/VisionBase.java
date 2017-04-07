@@ -226,7 +226,7 @@ public class VisionBase {
     }
 
     public int getError(){
-    	return Target_X-Setpoint;
+    	return -(Target_X-Setpoint);
     }
     
     public boolean Tracking(){

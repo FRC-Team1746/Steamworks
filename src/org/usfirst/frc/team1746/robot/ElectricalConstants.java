@@ -37,7 +37,7 @@ public class ElectricalConstants {
 	public int ENCODER_DRIVE_RIGHT_A = 2;
 	public int ENCODER_DRIVE_RIGHT_B = 3;
 	public int DIFFUSE_GEAR = 4;
-	public int dio4 = 5;
+	public int TURRET_LIMIT_SENSOR = 5;
 	public int dio6 = 6;
 	public int dio7 = 8;
 	public int dio8 = 8;

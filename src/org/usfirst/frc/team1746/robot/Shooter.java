@@ -40,8 +40,8 @@ public class Shooter {
 		shooterSlave.set(9);
 		
 		shooterMaster.setProfile(0);
-		shooterMaster.setF(0.03);
-		shooterMaster.setP(0.07);
+		shooterMaster.setF(0.03);//.03
+		shooterMaster.setP(0.07); //.07
 		shooterMaster.setI(0);
 		shooterMaster.setD(0);		
 	}

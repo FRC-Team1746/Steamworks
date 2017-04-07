@@ -35,7 +35,7 @@ public class Robot extends IterativeRobot {
 		drive = new Drivetrain(controls, vision);
 		climber = new Climber(controls); 
 		gear = new GearIntake(controls);
-		turret = new Turret(vision_boiler);
+		turret = new Turret(vision_boiler, controls);
 		intake = new Intake(controls);
 		loader = new Loader(controls);
 		shooter = new Shooter(controls);
@@ -101,7 +101,7 @@ public class Robot extends IterativeRobot {
 		
 		loader.checkControls();
 		
-		gear.checkControls();
+		//gear.checkControls();
 		gear.smartFlaps();
 		gear.leds();
 		
@@ -111,7 +111,9 @@ public class Robot extends IterativeRobot {
 		shooter.checkControls();
 		
 		if(controls.testButton()){
-			turret.track();
+			turret.teleop();
+			
+			SmartDashboard.putNumber("controls", controls.operator_turretRotation());
 		} else {
 			turret.set(0);
 		}
@@ -139,6 +141,7 @@ public class Robot extends IterativeRobot {
 		auton.updateSmartDashboard();
 		gear.updateSmartDashboard();
 		shooter.updateSmartDashboard();
+		turret.updateSmartDashboard();
 		vision.updateSmartdashboard();
 		vision_boiler.updateSmartdashboard();
 	}
