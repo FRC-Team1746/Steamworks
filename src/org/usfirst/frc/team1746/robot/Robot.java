@@ -103,6 +103,7 @@ public class Robot extends IterativeRobot {
 		
 		//gear.checkControls();
 		gear.smartFlaps();
+		gear.checkControls();
 		gear.leds();
 		
 		rgb_leds.update();
@@ -110,13 +111,7 @@ public class Robot extends IterativeRobot {
 		conveyor.checkControls();
 		shooter.checkControls();
 		
-		if(controls.testButton()){
-			turret.teleop();
-			
-			SmartDashboard.putNumber("controls", controls.operator_turretRotation());
-		} else {
-			turret.set(0);
-		}
+		turret.teleop();
 		
 		
 		

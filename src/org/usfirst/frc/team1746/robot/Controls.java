@@ -72,7 +72,7 @@ public class Controls {
 		return xbox_driver.getRawButton(8); 
 	}
 	public boolean driver_pixyControlOff(){
-		return xbox_driver.getRawButton(9);
+		return xbox_driver.getRawButton(7);
 	}
 	// Toggle Allign to Gear Peg
 	public boolean driver_gearAllign(){
@@ -104,12 +104,12 @@ public class Controls {
 	public boolean operator_outtakeBalls(){
 		return xbox_operator.getRawButton(2);
 	}
-	/*public boolean operator_gearHopperOut(){
-		return xbox_operator.getRawButton(1);
+	public boolean operator_gearHopperOut(){
+		return xbox_operator.getRawButton(4);
 	}
 	public boolean operator_gearHopperIn(){
 	return xbox_operator.getRawButton(3);
-	}*/
+	}
 	
 	// Gear Flap Control
 	public boolean operator_gearFlapsOut(){
@@ -124,7 +124,7 @@ public class Controls {
 		return xbox_operator.getRawButton(8);
 	}
 	public boolean operator_pixyControlOff(){
-		return xbox_operator.getRawButton(9);
+		return xbox_operator.getRawButton(7);
 	}
 	// Turret Rotation
 	public double operator_turretRotation(){
@@ -146,10 +146,19 @@ public class Controls {
 	public boolean operator_climberUp(){
 		return xbox_operator.getPOV() == 315 || xbox_operator.getPOV() == 0 || xbox_operator.getPOV() == 45 ;
 	}
+	public boolean operator_climberSlow(){
+		return xbox_operator.getPOV() == 270;
+	}
+	
 	public boolean operator_climberDown(){
 		return xbox_operator.getPOV() == 135 || xbox_operator.getPOV() == 180 || xbox_operator.getPOV() == 225 ;
 	}
-	
+	public boolean operator_shooterRPMdown(){
+		return xbox_operator.getRawButton(3);
+	}
+	public boolean operator_shooterRPMup(){
+		return xbox_operator.getRawButton(4);
+	}
 	
 /*********************************************************************************/
 

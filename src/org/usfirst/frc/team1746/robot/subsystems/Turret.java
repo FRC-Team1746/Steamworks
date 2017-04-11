@@ -38,7 +38,7 @@ public class Turret {
 	
 	int error = 0;
 	int allowance = 5;
-	double p = 0.1;
+	double p = 0.075;
 	
 	double speed = .2;
 	double prevSpeed = 0;
@@ -75,17 +75,18 @@ public class Turret {
 	
 	public void checkControls(){
 		if(m_controls.operator_turretRotation() > .25){
-			turret.set(.15);
+			turret.set(.2);
 		} else if(m_controls.operator_turretRotation() < -.25){
-			turret.set(-.15);
+			turret.set(-.2);
 		} else {
-			track();
+			turret.set(0);
 		}
 	}
 	
 	
 	boolean toggleTracking = false;
 	public void teleop(){
+		
 		if(m_controls.operator_pixyControlOn()) toggleTracking = true;
 		if(m_controls.operator_pixyControlOff()) toggleTracking = false;
 		

@@ -161,7 +161,7 @@ public class Drivetrain {
 		}
 	}	
 	
-	double vision_P = .0035;
+	double vision_P = .005; //0035
 	double vision_speedLeft;
 	double vision_speedRight;
 	double vision_error;

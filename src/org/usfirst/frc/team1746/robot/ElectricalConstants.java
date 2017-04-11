@@ -14,8 +14,8 @@ public class ElectricalConstants {
 	public int MOTOR_INTAKE = 4;
 	public int MOTOR_LOADER = 5;
 	public int MOTOR_CONVEYOR= 6;
-	public int pwm7 = 7;
-	public int MOTOR_CLIMBER = 8;
+	public int MOTOR_CLIMBER_A = 14;
+	public int MOTOR_CLIMBER_B = 8;
 	public int MOTOR_TURRET = 9;
 	
 	// MoreBoard

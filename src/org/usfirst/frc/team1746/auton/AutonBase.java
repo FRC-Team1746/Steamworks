@@ -36,17 +36,20 @@ public class AutonBase {
 	GearLeft gear_l;
 	GearCenter gear_c;
 	GearRight gear_r;
+	Forward forward;
 	
 	int loops = 0;
 	
 	public void init(){
-		gear_l = new GearLeft(m_drive, m_gear, m_loader, m_shooter, m_conveyor);
-		gear_c = new GearCenter(m_drive, m_gear, m_loader, m_shooter, m_conveyor);
-		gear_r = new GearRight(m_drive, m_gear, m_vision);
+		gear_l = new GearLeft(m_drive, m_gear, m_loader, m_conveyor, m_shooter);
+		gear_c = new GearCenter(m_drive, m_gear, m_loader, m_shooter);
+		gear_r = new GearRight(m_drive, m_gear, m_loader, m_conveyor, m_shooter);
+		forward = new Forward(m_drive);
 		
 		gear_l.init();
 		gear_c.init();
 		gear_r.init();
+		forward.init();
 	}
 	public void initSmartDashboard() {
 		initAutonSelector();
@@ -75,6 +78,8 @@ public class AutonBase {
 		autonSelector.addDefault("Left Gear", "gear_l");
 		autonSelector.addObject("Center Gear", "gear_c");
 		autonSelector.addObject("Right Gear", "gear_r");
+		autonSelector.addObject("Drive Forward", "forward");
+		autonSelector.addObject("None", "none");
 		SmartDashboard.putData("Auton Selector", autonSelector);
 	}
 	public void initShootSelector(){
@@ -118,6 +123,14 @@ public class AutonBase {
 		}
 		if(selectedAuton().equalsIgnoreCase("gear_l")){
 			gear_l.auton(selectedAlliance(), selectedShoot());
+		}
+		
+		if(selectedAuton().equalsIgnoreCase("forward")){
+			forward.auton();
+		}
+		
+		if(selectedAuton().equalsIgnoreCase("none")){
+			
 		}
 	}	
 	

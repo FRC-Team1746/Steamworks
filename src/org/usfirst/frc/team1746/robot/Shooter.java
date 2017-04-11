@@ -51,9 +51,9 @@ public class Shooter {
 	
 	public void updateSmartDashboard(){
 		SmartDashboard.putNumber("Shooter: Speed", getSpeed());
-		SmartDashboard.putNumber("Shooter: EncPosition", getEncPosition());
-		SmartDashboard.putNumber("Shooter: EncVelocity", getEncVelocity());
-		SmartDashboard.putNumber("Shooter: TargetSpeed", targetSpeed);
+		//SmartDashboard.putNumber("Shooter: EncPosition", getEncPosition());
+		//SmartDashboard.putNumber("Shooter: EncVelocity", getEncVelocity());
+		//SmartDashboard.putNumber("Shooter: TargetSpeed", targetSpeed);
 	}
 	
 	double targetSpeed;
@@ -88,12 +88,52 @@ public class Shooter {
 		return shooterMaster.getEncVelocity();
 	}
 	
+	
+	int speed = -3000;
+	int loops = 0;
+	boolean speedUp;
+	boolean speedDown;
 	public void checkControls(){
+		SmartDashboard.putNumber("Shooter Desired Speed", speed);
+		
+		if(m_controls.operator_shooterRPMup()){
+			if(!speedUp){
+				speedUp = true;
+				speed -=100;
+			}
+
+		} else {
+			speedUp = false;
+		}
+		
+		if(m_controls.operator_shooterRPMdown()){
+			if(!speedDown){
+				speedDown = true;
+				speed += 100;
+			}
+		} else {
+			speedDown = false;
+		}
+		
 		if(m_controls.operator_conveyor_shooter()){
-			setRPM(-3000);
+			setRPM(speed);
 		} else {
 			stop();
 		}
+		/*if(m_controls.operator_shooterRPMup()){
+			loops++;
+			if(loops > 20)	{
+				speed -= 100;
+				loops = 0;
+			}
+		}
+		if(m_controls.operator_shooterRPMdown()){
+			loops++;
+			if(loops > 20)	{
+				speed += 100;
+				loops = 0;
+			}
+		} */
 		
 		
 	}

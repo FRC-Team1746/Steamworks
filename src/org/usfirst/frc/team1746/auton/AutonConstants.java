@@ -2,7 +2,7 @@ package org.usfirst.frc.team1746.auton;
 
 public class AutonConstants {
 	// Left Gear
-	double L_DIST_DRIVE = 550;
+	double L_DIST_DRIVE = 600;
 	double L_DIST_GEAR_PEG = 350;
 	double L_DIST_FROM_PEG = 150;
 	double L_DIST_AWAY = 500;
@@ -21,7 +21,7 @@ public class AutonConstants {
 	
 	
 	// Right Gear
-	double R_DIST_DRIVE = 690;
+	double R_DIST_DRIVE = 680;
 	double R_DIST_GEAR_PEG = 350;
 	double R_DIST_FROM_PEG = 150;
 	double R_DIST_CENTER = 1000;

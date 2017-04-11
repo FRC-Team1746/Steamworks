@@ -30,7 +30,7 @@ public class Loader {
 
 	public void checkControls(){
 		if(m_controls.operator_loader()){
-			set(-1);
+			set(-.5);
 		} else {
 			set(0);
 		}

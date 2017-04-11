@@ -144,11 +144,12 @@ public class GearIntake {
 	
 	// Not Used
 	public void checkControls(){
-//		if(m_controls.operator_gearFlapsOut() || m_controls.driver_gearFlapsOut()){
-//			flapsOut();
-//		} else if(m_controls.operator_gearFlapsIn() || m_controls.driver_gearFlapsIn()){
-//			flapsIn();
-		/*} else*/ 
+		if(m_controls.operator_gearHopperOut()){
+			hopperFlapsOut();
+		}
+		if(m_controls.operator_gearHopperIn()){
+			hopperFlapsIn();
+		} 
 		
 	}
 	

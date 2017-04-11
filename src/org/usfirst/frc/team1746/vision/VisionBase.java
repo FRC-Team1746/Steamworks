@@ -201,40 +201,40 @@ public class VisionBase {
     	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     	SmartDashboard.putNumber("Target_X", Target_X);
     	SmartDashboard.putNumber("Target_Y", Target_Y);
-    	SmartDashboard.putNumber("Target_W", Target_W);
-    	SmartDashboard.putNumber("Target_H", Target_H);
+//    	SmartDashboard.putNumber("Target_W", Target_W);
+//    	SmartDashboard.putNumber("Target_H", Target_H);
     	SmartDashboard.putNumber("Target_error", getError());
     	SmartDashboard.putNumber("numTargets: ", numTargets);
 
-    	SmartDashboard.putNumber("signature", signature);
-    	SmartDashboard.putNumber("xPos1", xPos1);
-    	SmartDashboard.putNumber("xPos2", xPos2);
-    	SmartDashboard.putNumber("yPos1", yPos1);
-    	SmartDashboard.putNumber("yPos2", yPos2);
-    	SmartDashboard.putNumber("width1", width1);
-    	SmartDashboard.putNumber("height", height1);
-    	SmartDashboard.putNumber("width2", width2);
-    	SmartDashboard.putNumber("height", height2);
+//    	SmartDashboard.putNumber("signature", signature);
+//    	SmartDashboard.putNumber("xPos1", xPos1);
+//    	SmartDashboard.putNumber("xPos2", xPos2);
+//    	SmartDashboard.putNumber("yPos1", yPos1);
+//    	SmartDashboard.putNumber("yPos2", yPos2);
+//    	SmartDashboard.putNumber("width1", width1);
+//    	SmartDashboard.putNumber("height", height1);
+//    	SmartDashboard.putNumber("width2", width2);
+//    	SmartDashboard.putNumber("height", height2);
 
 
     	SmartDashboard.putBoolean("foundBothTargets", foundBothTargets);
-    	SmartDashboard.putBoolean("checkSumAValid", checkSumAValid);
-    	SmartDashboard.putBoolean("checkSumBValid", checkSumBValid);
-    	SmartDashboard.putBoolean("sigAValid", sigAValid);
-    	SmartDashboard.putBoolean("sigBValid", sigAValid);
-    	SmartDashboard.putBoolean("frameFound", frameFound);
+//    	SmartDashboard.putBoolean("checkSumAValid", checkSumAValid);
+//    	SmartDashboard.putBoolean("checkSumBValid", checkSumBValid);
+//    	SmartDashboard.putBoolean("sigAValid", sigAValid);
+//    	SmartDashboard.putBoolean("sigBValid", sigAValid);
+//    	SmartDashboard.putBoolean("frameFound", frameFound);
     }
 
     public int getError(){
-    	return -(Target_X-Setpoint);
+    	return Target_X-Setpoint;
+    }
+    
+    public int getNumTargets(){
+    	return numTargets;
     }
     
     public boolean Tracking(){
     	return Tracking;
     }
-
-	public int getNumTargets() {
-		return numTargets;
-	}
     
 }

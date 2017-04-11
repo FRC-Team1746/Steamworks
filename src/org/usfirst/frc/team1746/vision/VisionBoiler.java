@@ -199,28 +199,28 @@ public class VisionBoiler {
     	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     	SmartDashboard.putNumber("bTarget_X", Target_X);
     	SmartDashboard.putNumber("bTarget_Y", Target_Y);
-    	SmartDashboard.putNumber("bTarget_W", Target_W);
-    	SmartDashboard.putNumber("bTarget_H", Target_H);
+//    	SmartDashboard.putNumber("bTarget_W", Target_W);
+//    	SmartDashboard.putNumber("bTarget_H", Target_H);
     	SmartDashboard.putNumber("bTarget_error", getError());
     	SmartDashboard.putNumber("bnumTargets: ", numTargets);
 
-    	SmartDashboard.putNumber("bsignature", signature);
-    	SmartDashboard.putNumber("bxPos1", xPos1);
-    	SmartDashboard.putNumber("bxPos2", xPos2);
-    	SmartDashboard.putNumber("byPos1", yPos1);
-    	SmartDashboard.putNumber("byPos2", yPos2);
-    	SmartDashboard.putNumber("bwidth1", width1);
-    	SmartDashboard.putNumber("bheight", height1);
-    	SmartDashboard.putNumber("bwidth2", width2);
-    	SmartDashboard.putNumber("bheight", height2);
+//    	SmartDashboard.putNumber("bsignature", signature);
+//    	SmartDashboard.putNumber("bxPos1", xPos1);
+//    	SmartDashboard.putNumber("bxPos2", xPos2);
+//    	SmartDashboard.putNumber("byPos1", yPos1);
+//    	SmartDashboard.putNumber("byPos2", yPos2);
+//    	SmartDashboard.putNumber("bwidth1", width1);
+//    	SmartDashboard.putNumber("bheight", height1);
+//    	SmartDashboard.putNumber("bwidth2", width2);
+//    	SmartDashboard.putNumber("bheight", height2);
 
 
     	SmartDashboard.putBoolean("bfoundBothTargets", foundBothTargets);
-    	SmartDashboard.putBoolean("bcheckSumAValid", checkSumAValid);
-    	SmartDashboard.putBoolean("bcheckSumBValid", checkSumBValid);
-    	SmartDashboard.putBoolean("bsigAValid", sigAValid);
-    	SmartDashboard.putBoolean("bsigBValid", sigAValid);
-    	SmartDashboard.putBoolean("bframeFound", frameFound);
+//    	SmartDashboard.putBoolean("bcheckSumAValid", checkSumAValid);
+//    	SmartDashboard.putBoolean("bcheckSumBValid", checkSumBValid);
+//    	SmartDashboard.putBoolean("bsigAValid", sigAValid);
+//    	SmartDashboard.putBoolean("bsigBValid", sigAValid);
+//    	SmartDashboard.putBoolean("bframeFound", frameFound);
     }
 
     public int getError(){

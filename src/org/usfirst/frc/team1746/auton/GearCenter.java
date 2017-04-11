@@ -1,6 +1,5 @@
 package org.usfirst.frc.team1746.auton;
 
-import org.usfirst.frc.team1746.robot.Conveyor;
 import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
 import org.usfirst.frc.team1746.robot.Loader;
@@ -16,13 +15,11 @@ public class GearCenter {
 	private GearIntake m_gear;
 	private Loader m_loader;
 	private Shooter m_shooter;
-	private Conveyor m_conveyor;
-	public GearCenter(Drivetrain drive, GearIntake gear, Loader loader, Shooter shooter, Conveyor conveyor){
+	public GearCenter(Drivetrain drive, GearIntake gear, Loader loader, Shooter shooter){
 		m_drive = drive;
 		m_gear = gear;
 		m_loader = loader;
 		m_shooter = shooter;
-		m_conveyor = conveyor;
 	}
 	
 	public enum States {
@@ -59,69 +56,25 @@ public class GearCenter {
 		switch(currentState){
 		case INIT: 
 			m_drive.resetEncoders();
-			if(shoot){
-				currentState = States.SHOOT_INIT;
-				break;
-			}
 			currentState = States.DRIVE_INIT; // change to shoot init
 		break;
-		
-		// Shoot then turn to peg
-		case SHOOT_INIT:
-			loops++;
-			m_shooter.setRPM(aConstants.C_SHOOTER_RPM);
-			if(loops > 40){
-				loops = 0;
-				currentState = States.SHOOT;
-			}
-		break;
-		case SHOOT:
-			loops++;
-			m_loader.set(1);
-			m_conveyor.sets(1);
-			if(loops > 280){
-				loops = 0;
-				m_loader.stop();
-				m_shooter.stop();
-				currentState = States.ROTATE_PEG;
-			}
-		break;	
-		case ROTATE_PEG:
-			if(alliance.equalsIgnoreCase("red")){
-				m_drive.rotate("left");
-				if(m_drive.gyroAngle() > 82){
-					m_drive.stop();
-					m_drive.resetEncoders();
-					currentState = States.DRIVE_INIT;
-				}
-			} else {
-				m_drive.rotate("right");
-				if(m_drive.gyroAngle() < -82){
-					m_drive.stop();
-					m_drive.resetEncoders();
-					currentState = States.DRIVE_INIT;
-				}
-			}
-			
-		break;
-		//Drive to gear peg
 		case DRIVE_INIT:
 			m_drive.resetEncoders();
 			m_drive.resetSpeedPID();
 			currentState = States.DRIVE_TO_PEG;
-		break;		
+		break;
 		case DRIVE_TO_PEG: 
-			m_drive.towardsPeg(-.375);
+			m_drive.towardsPeg(-.35);
 			if(m_drive.avgEncoderTicks() > aConstants.C_DIST_GEAR_PEG){
 				m_drive.resetEncoders();
 				currentState = States.WAIT_GEAR_REMOVAL;
 			}
 		break;	
 		case WAIT_GEAR_REMOVAL: 
-			m_drive.straight(-.25);
+			m_drive.straight(-.275);
 			if(m_gear.gearSensor()){
 				loops++;
-				if(loops > 150){
+				if(loops > 100){
 					loops = 0;
 					m_drive.resetEncoders();
 					currentState = States.DRIVE_FROM_PEG;

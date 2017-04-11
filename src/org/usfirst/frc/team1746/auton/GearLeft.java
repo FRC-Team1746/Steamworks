@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1746.auton;
 
+import org.usfirst.frc.team1746.auton.GearRight.States;
 import org.usfirst.frc.team1746.robot.Conveyor;
 import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
@@ -13,23 +14,22 @@ public class GearLeft {
 	
 	private Drivetrain m_drive;
 	private GearIntake m_gear;
-	private Shooter m_shooter;
 	private Loader m_loader;
 	private Conveyor m_conveyor;
-	public GearLeft(Drivetrain drive, GearIntake gear,  Loader loader, Shooter shooter,Conveyor conveyor) {
+	private Shooter m_shooter;
+	
+	public GearLeft(Drivetrain drive, GearIntake gear, Loader loader, Conveyor conveyor, Shooter shooter) {
 		m_drive = drive;
 		m_gear = gear;
 		m_loader = loader;
-		m_shooter = shooter;
 		m_conveyor = conveyor;
+		m_shooter = shooter;
 	}
-	
-	
+
 	public enum States {
 		INIT,
 		SHOOT_INIT,
 		SHOOT,
-		ROTATE_STRAIGHT,
 		DRIVE,
 		DRIVE_ROTATE_RIGHT,
 		DRIVE_TO_PEG,
@@ -57,7 +57,7 @@ public class GearLeft {
 	public void init(){
 		reset();
 	}
-	public void auton(String alliance, Boolean shoot){
+	public void auton(String alliance, boolean shoot){
 		switch(currentState){
 		case INIT: 
 			m_drive.resetEncoders();
@@ -66,39 +66,27 @@ public class GearLeft {
 				break;
 			}
 			currentState = States.DRIVE;
-		break;	
-		
-		// Shoot then turn back to straight
+		break;						
 		case SHOOT_INIT:
 			loops++;
-			m_shooter.setRPM(aConstants.L_SHOOTER_RPM);
-			if(loops > 40){
+			m_conveyor.set(-.65);
+			m_shooter.setRPM(-3100);
+			if(loops > 75){
 				loops = 0;
 				currentState = States.SHOOT;
 			}
 		break;
 		case SHOOT:
 			loops++;
-			m_loader.set(1);
-			//m_conveyor.sets(1);
-			if(loops > 280){
-				loops = 0;
-				m_loader.stop();
+			m_loader.set(-.5);
+			if(loops > 250){
+				m_loader.set(0);
+				m_conveyor.set(0);
 				m_shooter.stop();
-				currentState = States.ROTATE_STRAIGHT;
-			}
-		break;		
-		case ROTATE_STRAIGHT:
-			m_drive.rotate("right");
-			if(m_drive.gyroAngle() < -82){
-				m_drive.stop();
-				m_drive.resetEncoders();
 				currentState = States.DRIVE;
 			}
 		break;
-	
-		//
-		/*case DRIVE: 
+		case DRIVE: 
 			m_drive.straightPID(-.4);
 			if(m_drive.avgEncoderTicks() > aConstants.L_DIST_DRIVE){
 				m_drive.stop();
@@ -106,35 +94,17 @@ public class GearLeft {
 				currentState = States.DRIVE_ROTATE_RIGHT;
 			}
 		break;
-		*/
-		case DRIVE: 
-			m_drive.straight(-.4);
-			if(m_drive.avgEncoderTicks() > aConstants.R_DIST_DRIVE-160){
-				m_drive.resetEncoders();
-				m_drive.stop();
-				currentState = States.DRIVE_ROTATE_RIGHT;
-			}
-		break;
 		case DRIVE_ROTATE_RIGHT:
-			m_drive.set(-.4, .1);
-			if(m_drive.gyroAngle() < -45){
-				m_drive.stop();
-				m_drive.resetEncoders();
-				currentState = States.DRIVE_TO_PEG;
-			}
-		break;
-		/*case DRIVE_ROTATE_RIGHT:
 			m_drive.rotate("right");
-			if(m_drive.gyroAngle() < -56){
+			if(m_drive.gyroAngle() < -63){
 				m_drive.stop();
 				m_drive.resetEncoders();
 				currentState = States.DRIVE_TO_PEG;
 			}
 		break;
-		*/
 		case DRIVE_TO_PEG:
-			m_drive.towardsPeg(-.35);
-			if(m_drive.avgEncoderTicks() > aConstants.L_DIST_GEAR_PEG){
+			m_drive.towardsPeg(-.3);
+			if(m_drive.avgEncoderTicks() > aConstants.L_DIST_GEAR_PEG ){
 				m_drive.stop();
 				m_drive.resetEncoders();
 				currentState = States.WAIT_GEAR_REMOVAL;
