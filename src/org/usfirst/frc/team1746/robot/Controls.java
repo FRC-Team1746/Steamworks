@@ -104,11 +104,11 @@ public class Controls {
 	public boolean operator_outtakeBalls(){
 		return xbox_operator.getRawButton(2);
 	}
-	public boolean operator_gearHopperOut(){
-		return xbox_operator.getRawButton(4);
-	}
 	public boolean operator_gearHopperIn(){
-	return xbox_operator.getRawButton(3);
+		return xbox_operator.getRawButton(9);
+	}
+	public boolean operator_gearHopperOut(){
+	return xbox_operator.getRawButton(10);
 	}
 	
 	// Gear Flap Control
@@ -137,6 +137,9 @@ public class Controls {
 	// Loader Toggle
 	public boolean operator_loader(){
 		return xbox_operator.getRawAxis(3) > .05;
+	}
+	public boolean operator_loaderReverse(){
+		return xbox_operator.getPOV() == 90;
 	}
 	// Conveyor Toggle
 	public boolean operator_conveyor_shooter(){

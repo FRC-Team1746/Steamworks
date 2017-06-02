@@ -41,9 +41,9 @@ public class Shooter {
 		
 		shooterMaster.setProfile(0);
 		shooterMaster.setF(0.03);//.03
-		shooterMaster.setP(0.07); //.07
+		shooterMaster.setP(0.3); //.07
 		shooterMaster.setI(0);
-		shooterMaster.setD(0);		
+		shooterMaster.setD(10);		
 	}
 	public void initSmartDashboard(){
 		
@@ -89,7 +89,7 @@ public class Shooter {
 	}
 	
 	
-	int speed = -3000;
+	int speed = -2815;
 	int loops = 0;
 	boolean speedUp;
 	boolean speedDown;
@@ -109,7 +109,7 @@ public class Shooter {
 		if(m_controls.operator_shooterRPMdown()){
 			if(!speedDown){
 				speedDown = true;
-				speed += 100;
+				speed += 50;
 			}
 		} else {
 			speedDown = false;
@@ -119,22 +119,7 @@ public class Shooter {
 			setRPM(speed);
 		} else {
 			stop();
-		}
-		/*if(m_controls.operator_shooterRPMup()){
-			loops++;
-			if(loops > 20)	{
-				speed -= 100;
-				loops = 0;
-			}
-		}
-		if(m_controls.operator_shooterRPMdown()){
-			loops++;
-			if(loops > 20)	{
-				speed += 100;
-				loops = 0;
-			}
-		} */
-		
+		}	
 		
 	}
 }

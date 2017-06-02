@@ -78,6 +78,11 @@ public class GearIntake {
 		hopperFlapsOut.set(false);
 		hopperFlapsIn.set(true);
 	}
+	public void hopperFlapsOff(){
+		hopperFlapsOut.set(false);
+		hopperFlapsIn.set(false);
+	}
+	
 	public void LEDsOn(){
 		LEDLeft.set(true);
 		LEDRight.set(true);
@@ -146,6 +151,8 @@ public class GearIntake {
 	public void checkControls(){
 		if(m_controls.operator_gearHopperOut()){
 			hopperFlapsOut();
+			
+			
 		}
 		if(m_controls.operator_gearHopperIn()){
 			hopperFlapsIn();

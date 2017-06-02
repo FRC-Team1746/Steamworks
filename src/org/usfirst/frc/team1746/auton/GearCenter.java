@@ -1,9 +1,12 @@
 package org.usfirst.frc.team1746.auton;
 
+import org.usfirst.frc.team1746.robot.Conveyor;
 import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
 import org.usfirst.frc.team1746.robot.Loader;
 import org.usfirst.frc.team1746.robot.Shooter;
+
+import edu.wpi.first.wpilibj.Timer;
 
 public class GearCenter {
 	
@@ -11,25 +14,28 @@ public class GearCenter {
 
 	int loops = 0;
 	
+	Timer timer;
+	
 	private Drivetrain m_drive;
 	private GearIntake m_gear;
 	private Loader m_loader;
+	private Conveyor m_conveyor;
 	private Shooter m_shooter;
-	public GearCenter(Drivetrain drive, GearIntake gear, Loader loader, Shooter shooter){
+	public GearCenter(Drivetrain drive, GearIntake gear, Loader loader, Conveyor conveyor,Shooter shooter){
 		m_drive = drive;
 		m_gear = gear;
 		m_loader = loader;
+		m_conveyor = conveyor;
 		m_shooter = shooter;
 	}
 	
 	public enum States {
 		INIT,
-		SHOOT_INIT,
-		SHOOT,
 		DRIVE_INIT,
 		DRIVE_BACKUP,
 		ROTATE_PEG,
 		DRIVE_TO_PEG,
+		SHOOT,
 		WAIT_GEAR_REMOVAL,
 		DRIVE_FROM_PEG,
 		DRIVE_ROTATE,
@@ -46,15 +52,21 @@ public class GearCenter {
 	}
 	
 	public void reset(){
+		timer.reset();
 		currentState = States.INIT;
 		loops = 0;
 	}
 	public void init(){
+		timer = new Timer();
 		reset();
 	}
+	
+	
+	int shooterRPM = 0;
 	public void auton(String alliance, boolean shoot, boolean wiggle){
 		switch(currentState){
 		case INIT: 
+			reset();
 			m_drive.resetEncoders();
 			currentState = States.DRIVE_INIT; // change to shoot init
 		break;
@@ -62,14 +74,47 @@ public class GearCenter {
 			m_drive.resetEncoders();
 			m_drive.resetSpeedPID();
 			currentState = States.DRIVE_TO_PEG;
+			
 		break;
 		case DRIVE_TO_PEG: 
 			m_drive.towardsPeg(-.35);
+			m_conveyor.set(0);
+			if(shoot){
+				if(alliance.equalsIgnoreCase("blue")){
+					m_shooter.setRPM(aConstants.C_RPM_BLUE);
+				} else {
+					m_shooter.setRPM(aConstants.C_RPM_RED);
+				}
+			}
 			if(m_drive.avgEncoderTicks() > aConstants.C_DIST_GEAR_PEG){
+				timer.start();
 				m_drive.resetEncoders();
+				if(shoot){
+					currentState = States.SHOOT;
+					break;
+				}
 				currentState = States.WAIT_GEAR_REMOVAL;
 			}
-		break;	
+		break;
+		case SHOOT:
+			m_drive.straightPID(-.175);
+			if(timer.get() >= 2){
+				if(alliance.equalsIgnoreCase("blue")){
+					m_shooter.setRPM(aConstants.C_RPM_BLUE);
+				} else {
+					m_shooter.setRPM(aConstants.C_RPM_RED);
+				}
+				m_conveyor.set(-.7);
+				m_loader.set(-.3);
+				if(timer.get() > 7){
+					timer.stop();
+					m_shooter.stop();
+					m_conveyor.set(0);
+					m_loader.stop();
+					currentState = States.WAIT_GEAR_REMOVAL;
+				}
+			}
+		break;
 		case WAIT_GEAR_REMOVAL: 
 			m_drive.straight(-.275);
 			if(m_gear.gearSensor()){

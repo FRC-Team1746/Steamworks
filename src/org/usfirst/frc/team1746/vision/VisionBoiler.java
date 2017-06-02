@@ -224,7 +224,7 @@ public class VisionBoiler {
     }
 
     public int getError(){
-    	return Target_X-Setpoint;
+    	return Target_X-Setpoint+35;
     }
     
     public boolean Tracking(){

@@ -70,7 +70,7 @@ public class Drivetrain {
 	
 	int sumEncoderErrors;
 	double leftMotorSpeed = 0; //<======== Need to figure out how to get this?
-	double MOTOR_INCREMENT_RATE = .01;
+	double MOTOR_INCREMENT_RATE = .075;
 	
 	public void resetEncoders(){
 		encoderLeft.reset();
@@ -126,6 +126,8 @@ public class Drivetrain {
 	
 	public void resetSpeedPID(){
 		leftMotorSpeed = 0;
+		vision_speedLeft = 0;
+		vision_speedRight = 0;
 	}
 	
 	public void straightPID(double desiredLeftMotorSpeed){
@@ -155,13 +157,13 @@ public class Drivetrain {
 	
 	public void rotate(String direction){
 		if(direction.equalsIgnoreCase("left")){		
-			myRobot.setLeftRightMotorOutputs(.30, -.30);
+			myRobot.setLeftRightMotorOutputs(.27, -.27);
 		} else if(direction.equalsIgnoreCase("right")){
-			myRobot.setLeftRightMotorOutputs(-.30, .30);
+			myRobot.setLeftRightMotorOutputs(-.27, .27);
 		}
 	}	
 	
-	double vision_P = .005; //0035
+	double vision_P = .004; //005
 	double vision_speedLeft;
 	double vision_speedRight;
 	double vision_error;

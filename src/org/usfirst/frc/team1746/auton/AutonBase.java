@@ -37,25 +37,29 @@ public class AutonBase {
 	GearCenter gear_c;
 	GearRight gear_r;
 	Forward forward;
+	Hopper hopper;
 	
 	int loops = 0;
 	
 	public void init(){
-		gear_l = new GearLeft(m_drive, m_gear, m_loader, m_conveyor, m_shooter);
-		gear_c = new GearCenter(m_drive, m_gear, m_loader, m_shooter);
-		gear_r = new GearRight(m_drive, m_gear, m_loader, m_conveyor, m_shooter);
+		gear_l = new GearLeft(m_drive, m_gear, m_loader, m_conveyor, m_shooter, m_vision);
+		gear_c = new GearCenter(m_drive, m_gear, m_loader, m_conveyor, m_shooter);
+		gear_r = new GearRight(m_drive, m_gear, m_loader, m_conveyor, m_shooter, m_vision);
 		forward = new Forward(m_drive);
-		
+		hopper = new Hopper(m_drive, m_gear, m_shooter, m_conveyor, m_loader);
 		gear_l.init();
 		gear_c.init();
 		gear_r.init();
 		forward.init();
+		hopper.init();
 	}
 	public void initSmartDashboard() {
 		initAutonSelector();
 		initAllianceSelector();
 		initShootSelector();
 		SmartDashboard.putBoolean("Reset Auton", false);
+		
+		hopper.initSmartDashboard();
 	}
 	public void updateSmartDashboard(){
 		SmartDashboard.putString("Selected Alliance", selectedAlliance());
@@ -66,6 +70,8 @@ public class AutonBase {
 			resetAll();
 			SmartDashboard.putBoolean("Reset Auton", false);
 		}
+		
+		hopper.updateSmartDashboard();
 	}
 	
 	public void initAllianceSelector(){
@@ -78,6 +84,7 @@ public class AutonBase {
 		autonSelector.addDefault("Left Gear", "gear_l");
 		autonSelector.addObject("Center Gear", "gear_c");
 		autonSelector.addObject("Right Gear", "gear_r");
+		autonSelector.addObject("Hopper", "hopper");
 		autonSelector.addObject("Drive Forward", "forward");
 		autonSelector.addObject("None", "none");
 		SmartDashboard.putData("Auton Selector", autonSelector);
@@ -91,6 +98,7 @@ public class AutonBase {
 		gear_r.reset();
 		gear_c.reset();
 		gear_l.reset();
+		hopper.reset();
 		
 
 		m_drive.resetEncoders();
@@ -110,6 +118,7 @@ public class AutonBase {
 		if(selectedAuton().equalsIgnoreCase("gear_r")) return gear_r.currentState();
 		if(selectedAuton().equalsIgnoreCase("gear_c")) return gear_c.currentState();
 		if(selectedAuton().equalsIgnoreCase("gear_l")) return gear_l.currentState();
+		if(selectedAuton().equalsIgnoreCase("hopper")) return hopper.currentState();
 		else return "";
 	}
 	
@@ -128,7 +137,9 @@ public class AutonBase {
 		if(selectedAuton().equalsIgnoreCase("forward")){
 			forward.auton();
 		}
-		
+		if(selectedAuton().equalsIgnoreCase("hopper")){
+			hopper.auton(selectedAlliance());
+		}
 		if(selectedAuton().equalsIgnoreCase("none")){
 			
 		}

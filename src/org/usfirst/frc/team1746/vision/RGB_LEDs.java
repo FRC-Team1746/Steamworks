@@ -20,7 +20,7 @@ public class RGB_LEDs {
 	ElectricalConstants eConstants = new ElectricalConstants();
 	
 	I2C mxpI2C;
-	VisionBase m_vision;
+	VisionBoiler m_vision;
 	GearIntake m_gearIntake;
 	int m_error;
 	int m_error_prev = 31; //(no target)
@@ -29,7 +29,7 @@ public class RGB_LEDs {
 	int missing_frame_count=0;
 	
 	private Controls m_controls;
-	public RGB_LEDs(VisionBase vision, GearIntake gearIntake){
+	public RGB_LEDs(VisionBoiler vision, GearIntake gearIntake){
 		m_vision = vision;
 		m_gearIntake = gearIntake;
 	}
@@ -106,7 +106,7 @@ public class RGB_LEDs {
 		}
 		
 		// Add Gear present bit to I2C data
-		if(m_gearIntake.gearSensor())
+		if(!m_gearIntake.gearSensor())
 		{
 			m_I2CdataToSend = m_I2CdataToSend | 0x40; // set gear present bit
 		}

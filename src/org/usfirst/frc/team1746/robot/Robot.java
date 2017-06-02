@@ -8,6 +8,7 @@ import org.usfirst.frc.team1746.vision.VisionBoiler;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
@@ -41,7 +42,7 @@ public class Robot extends IterativeRobot {
 		shooter = new Shooter(controls);
 		conveyor = new Conveyor(controls);
 		auton = new AutonBase(drive, gear, loader, shooter, conveyor, vision);
-		rgb_leds = new RGB_LEDs(vision, gear);
+		rgb_leds = new RGB_LEDs(vision_boiler, gear);
 		
 		test = new DigitalOutput(11);
 		shooter.init();
@@ -101,7 +102,7 @@ public class Robot extends IterativeRobot {
 		
 		loader.checkControls();
 		
-		//gear.checkControls();
+		gear.checkControls();
 		gear.smartFlaps();
 		gear.checkControls();
 		gear.leds();
@@ -112,11 +113,6 @@ public class Robot extends IterativeRobot {
 		shooter.checkControls();
 		
 		turret.teleop();
-		
-		
-		
-		
-		
 	}
 		
 	@Override

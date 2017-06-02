@@ -44,10 +44,10 @@ public class ElectricalConstants {
 	public int dio9 = 9;
 	
 	//PCM
-	public int GEAR_FLAPS_OUT = 0;
-	public int GEAR_FLAPS_IN = 1;
-	public int GEAR_HOPPER_FLAPS_IN= 2;
-	public int GEAR_HOPPER_FLAPS_OUT = 3;
+	public int GEAR_FLAPS_OUT = 3;
+	public int GEAR_FLAPS_IN = 2;
+	public int GEAR_HOPPER_FLAPS_OUT= 1;
+	public int GEAR_HOPPER_FLAPS_IN = 0;
 	public int pcm4 = 4;
 	public int pcm5 = 5;
 	public int GEAR_LED_LEFT = 6;
