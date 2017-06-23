@@ -37,6 +37,7 @@ public class VisionBoiler {
 	int numTargets;
 	int Setpoint = 150;
 	
+	/*int SetSpeed;*/
 	
     public void init() {
     	pixyCam = new I2C(I2C.Port.kOnboard, 0xab);
@@ -189,7 +190,11 @@ public class VisionBoiler {
       		Target_W = width2;
       		Target_Y = yPos2;
       	}
+      	
+      	/*SetSpeed =  (0-((Target_H*Target_H*Target_H)+(Target_H*Target_H)+(Target_H)+(500)));*/
     }
+    
+    
       	//char width =     (char) (((pixyValues[i + 11]&0xff)  << 8) | (pixyValues[i + 10]&0xff));
       	//char height =    (char) (((pixyValues[i + 13]&0xff) << 8)  | (pixyValues[i + 12]&0xff));
       	
@@ -199,10 +204,11 @@ public class VisionBoiler {
     	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     	SmartDashboard.putNumber("bTarget_X", Target_X);
     	SmartDashboard.putNumber("bTarget_Y", Target_Y);
-//    	SmartDashboard.putNumber("bTarget_W", Target_W);
-//    	SmartDashboard.putNumber("bTarget_H", Target_H);
+    	SmartDashboard.putNumber("bTarget_W", Target_W);
+    	SmartDashboard.putNumber("bTarget_H", Target_H);
     	SmartDashboard.putNumber("bTarget_error", getError());
     	SmartDashboard.putNumber("bnumTargets: ", numTargets);
+//    	SmartDashboard.putInt("SetSpeed", SetSpeed);
 
 //    	SmartDashboard.putNumber("bsignature", signature);
 //    	SmartDashboard.putNumber("bxPos1", xPos1);
@@ -234,4 +240,8 @@ public class VisionBoiler {
 	public int getNumTargets() {
 		return numTargets;
 	}
+	
+	/*public int SetSpeed() {
+		return SetSpeed;
+	}*/
 }
