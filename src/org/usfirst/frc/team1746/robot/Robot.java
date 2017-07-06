@@ -5,6 +5,7 @@ import org.usfirst.frc.team1746.robot.subsystems.Turret;
 import org.usfirst.frc.team1746.vision.RGB_LEDs;
 import org.usfirst.frc.team1746.vision.VisionBase;
 import org.usfirst.frc.team1746.vision.VisionBoiler;
+import org.usfirst.frc.team1746.vision.VisionTargeting;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	VisionBase vision;
 	VisionBoiler vision_boiler;
+	VisionTargeting visionT;
 	Turret turret;
 	Controls controls;
 	Drivetrain drive;
@@ -39,7 +41,7 @@ public class Robot extends IterativeRobot {
 		turret = new Turret(vision_boiler, controls);
 		intake = new Intake(controls);
 		loader = new Loader(controls);
-		shooter = new Shooter(controls);
+		shooter = new Shooter(controls, visionT);
 		conveyor = new Conveyor(controls);
 		auton = new AutonBase(drive, gear, loader, shooter, conveyor, vision);
 		rgb_leds = new RGB_LEDs(vision_boiler, gear);

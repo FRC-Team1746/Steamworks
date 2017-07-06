@@ -4,6 +4,7 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.usfirst.frc.team1746.vision.VisionTargeting;
 
 public class Shooter {
 	
@@ -17,9 +18,10 @@ public class Shooter {
 	CANTalon shooterSlave;
 	
 	private Controls m_controls;
-	
-	public Shooter(Controls controls){
+	private VisionTargeting m_visionT;
+	public Shooter(Controls controls, VisionTargeting visionT){
 		m_controls = controls;
+		m_visionT = visionT;
 	}
 		
 	public void init(){
@@ -89,10 +91,11 @@ public class Shooter {
 	}
 	
 	
-	int speed = -2815;
+	int speed = -2745;
 	int loops = 0;
 	boolean speedUp;
 	boolean speedDown;
+	boolean speedSet;
 	public void checkControls(){
 		SmartDashboard.putNumber("Shooter Desired Speed", speed);
 		
@@ -113,6 +116,15 @@ public class Shooter {
 			}
 		} else {
 			speedDown = false;
+		}
+		
+		if(m_controls.driver_SetSpeed()){
+			if(!speedSet){
+				speedSet = true;
+				//speed = (int) m_visionT.getSpeed();
+			} 
+		} else {
+			speedSet = false;
 		}
 		
 		if(m_controls.operator_conveyor_shooter()){

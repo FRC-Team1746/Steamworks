@@ -1,6 +1,6 @@
 package org.usfirst.frc.team1746.auton;
 
-import org.usfirst.frc.team1746.auton.GearRight.States;
+import org.usfirst.frc.team1746.auton.GearRight2.States;
 import org.usfirst.frc.team1746.robot.Conveyor;
 import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;

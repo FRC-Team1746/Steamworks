@@ -12,10 +12,12 @@ public class VisionTargeting {
 	ElectricalConstants eConstants = new ElectricalConstants();
 	private VisionBase m_vision;
 	private GearIntake m_gear;
+	private VisionBoiler m_vision_boiler;
 	
-	public VisionTargeting(VisionBase vision, GearIntake gear){
+	public VisionTargeting(VisionBase vision, GearIntake gear, VisionBoiler vision_boiler){
 		m_vision = vision;
 		m_gear = gear;
+		m_vision_boiler = vision_boiler;
 	}
 	DigitalOutput errorB0;
 	DigitalOutput errorB1;
@@ -79,8 +81,16 @@ public class VisionTargeting {
 		errorB4.set(false);
 		
 	}
+	//Shooter Speed Calculation
+	double a = 1;
+	double b = 1;
+	double c = 1;
+	double d = 1;  
+	double h = m_vision_boiler.getHeight();
+  
+  	double speedFunction = -((a * Math.pow(h, 3)) + (b * Math.pow(h, 2)) + (c * h) + (d));//negative because forwards is backwards for shooter
 	
-	
-	
-	
+	public double getSpeed(){
+		return speedFunction;
+	}
 }

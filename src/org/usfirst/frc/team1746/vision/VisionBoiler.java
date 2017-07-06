@@ -37,8 +37,6 @@ public class VisionBoiler {
 	int numTargets;
 	int Setpoint = 150;
 	
-	/*int SetSpeed;*/
-	
     public void init() {
     	pixyCam = new I2C(I2C.Port.kOnboard, 0xab);
     			//VisionTiming = new DigitalOutput(0);
@@ -191,7 +189,6 @@ public class VisionBoiler {
       		Target_Y = yPos2;
       	}
       	
-      	/*SetSpeed =  (0-((Target_H*Target_H*Target_H)+(Target_H*Target_H)+(Target_H)+(500)));*/
     }
     
     
@@ -208,7 +205,6 @@ public class VisionBoiler {
     	SmartDashboard.putNumber("bTarget_H", Target_H);
     	SmartDashboard.putNumber("bTarget_error", getError());
     	SmartDashboard.putNumber("bnumTargets: ", numTargets);
-//    	SmartDashboard.putInt("SetSpeed", SetSpeed);
 
 //    	SmartDashboard.putNumber("bsignature", signature);
 //    	SmartDashboard.putNumber("bxPos1", xPos1);
@@ -233,6 +229,10 @@ public class VisionBoiler {
     	return Target_X-Setpoint+35;
     }
     
+    public double getHeight(){
+    	return (double) Target_H;
+    }
+    
     public boolean Tracking(){
     	return Tracking;
     }
@@ -241,7 +241,4 @@ public class VisionBoiler {
 		return numTargets;
 	}
 	
-	/*public int SetSpeed() {
-		return SetSpeed;
-	}*/
 }

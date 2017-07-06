@@ -18,34 +18,34 @@ public class Controls {
  * Xbox Controller Layout
  * 
  * 	Buttons
- *    1   - A
- *    2   - B
- *    3   - X
- *    4   - Y
- *    5   - Left Bumper
- *    6   - Right Bumper
- *    7   - Select
- *    8   - Start
- *    9   - Left Analog Button
- *    10  - Right Analog Button
+ *    1   - A                   - driver intake - operator 
+ *    2   - B                   - driver outake - operator
+ *    3   - X                   - driver
+ *    4   - Y                   - driver
+ *    5   - Left Bumper         - driver flaps out
+ *    6   - Right Bumper        - driver flaps in
+ *    7   - Select              - driver tracking off
+ *    8   - Start               - driver tracking on
+ *    9   - Left Analog Button  - driver
+ *    10  - Right Analog Button - driver
  *  
  *  Axis
- *    0   - Left Stick X
- *    1   - Left Stick Y
- *    2   - Left Trigger
- *    3   - Right Trigger
- *    4   - Right Stick X
- *    5   - Right Stick Y
+ *    0   - Left Stick X        - driver
+ *    1   - Left Stick Y        - driver
+ *    2   - Left Trigger        - driver
+ *    3   - Right Trigger       - driver
+ *    4   - Right Stick X       - driver
+ *    5   - Right Stick Y       - driver
  *  
  *  POV (DPAD)
- *    0   - DPAD Up
- *    45  - DPAD Up/Right
- *    90  - DPAD Right
- *    135 - DPAD Down/Right
- *    180 - DPAD Down
- *    225 - DPAD Down/Left
- *    270 - DPAD Left
- *    315 - DPAD Up/Left
+ *    0   - DPAD Up             - driver
+ *    45  - DPAD Up/Right       - driver
+ *    90  - DPAD Right          - driver
+ *    135 - DPAD Down/Right     - driver
+ *    180 - DPAD Down           - driver
+ *    225 - DPAD Down/Left      - driver
+ *    270 - DPAD Left           - driver 
+ *    315 - DPAD Up/Left        - driver
  *    
 */
 /*********************************************************************************/
@@ -77,6 +77,10 @@ public class Controls {
 	// Toggle Allign to Gear Peg
 	public boolean driver_gearAllign(){
 		return xbox_driver.getRawButton(8); 
+	}
+	// Set Target Speed To Pixy Calculation
+	public boolean driver_SetSpeed(){
+		return xbox_driver.getRawButton(9); 
 	}
 	// Left Axis
 	public int driver_leftAxis(){

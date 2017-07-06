@@ -34,6 +34,7 @@ public class AutonConstants {
 	double R_RPM_RED = -2760;
 	
 	double H_DIST_BLUE = 307;
+	double H_DIST_BLUE_FAR = 660;
 	double H_DIST_RED =  300;
 	double H_RPM_RED = -2745;
 	double H_RPM_BLUE = -2700;
