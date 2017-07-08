@@ -41,7 +41,7 @@ public class Robot extends IterativeRobot {
 		turret = new Turret(vision_boiler, controls);
 		intake = new Intake(controls);
 		loader = new Loader(controls);
-		shooter = new Shooter(controls, visionT);
+		shooter = new Shooter(controls, visionT, vision_boiler);
 		conveyor = new Conveyor(controls);
 		auton = new AutonBase(drive, gear, loader, shooter, conveyor, vision);
 		rgb_leds = new RGB_LEDs(vision_boiler, gear);

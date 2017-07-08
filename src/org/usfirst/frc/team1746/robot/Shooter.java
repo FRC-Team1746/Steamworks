@@ -4,6 +4,8 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import org.usfirst.frc.team1746.vision.VisionBoiler;
 import org.usfirst.frc.team1746.vision.VisionTargeting;
 
 public class Shooter {
@@ -19,9 +21,11 @@ public class Shooter {
 	
 	private Controls m_controls;
 	private VisionTargeting m_visionT;
-	public Shooter(Controls controls, VisionTargeting visionT){
+	private VisionBoiler m_visionB;
+	public Shooter(Controls controls, VisionTargeting visionT, VisionBoiler visionB){
 		m_controls = controls;
 		m_visionT = visionT;
+		m_visionB = visionB;
 	}
 		
 	public void init(){
@@ -91,6 +95,23 @@ public class Shooter {
 	}
 	
 	
+	double a = .8333333;
+	double b = -62.5;
+	double c = 1286.6666667;
+	double d = -10735;  
+	double h = 0;
+  
+  	double speedFunction = 0;
+	
+	public double getSpeedFromCam(){
+		h = m_visionB.getHeight();
+		speedFunction = (a * Math.pow(h, 3)) + (b * Math.pow(h, 2)) + (c * h) + (d);
+		return speedFunction;
+	}
+	
+	
+	
+	
 	int speed = -2745;
 	int loops = 0;
 	boolean speedUp;
@@ -102,7 +123,7 @@ public class Shooter {
 		if(m_controls.operator_shooterRPMup()){
 			if(!speedUp){
 				speedUp = true;
-				speed -=100;
+				speed -=20;
 			}
 
 		} else {
@@ -112,7 +133,7 @@ public class Shooter {
 		if(m_controls.operator_shooterRPMdown()){
 			if(!speedDown){
 				speedDown = true;
-				speed += 50;
+				speed += 10;
 			}
 		} else {
 			speedDown = false;
@@ -131,7 +152,10 @@ public class Shooter {
 			setRPM(speed);
 		} else {
 			stop();
-		}	
+		}
+		if(m_controls.driver_SetSpeed()){
+			speed = (int) getSpeedFromCam();
+		}
 		
 	}
 }

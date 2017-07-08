@@ -33,7 +33,7 @@ public class Turret {
 	}
 	
 	public double currentDraw(){
-		return pdp.getCurrent(eConstants.PDP_CHANNEL_12);
+		return pdp.getCurrent(eConstants.PDP_CHANNEL_11);
 	}
 	
 	int error = 0;
@@ -42,25 +42,38 @@ public class Turret {
 	
 	double speed = .2;
 	double prevSpeed = 0;
+	
+	boolean limit = false;
+	int limitCount = 0;
+	
 	public void track(){
-		error = m_vision_boiler.getError()-20;
-		/*if(error > allowance || error < -allowance){
+		if(currentDraw() > 2.6){
+			limitCount ++;
+		} else if(limitCount != 0){
+			limitCount --;
+		}
+		if(currentDraw() < 2.1){
+			limitCount = 0;
+		}
+		if(limitCount < 50){
+			error = m_vision_boiler.getError()-20;
+			/*if(error > allowance || error < -allowance){
 			if(p*error > 1) speed = 1;
 			else if(p*error < -1) speed = -1;
 			else speed = -p*error;
 			turret.set(speed);
 			prevSpeed = speed;
-		*/	
+			 */	
 		
-		speed = p*Math.log10(Math.abs(error));
-		if(error > allowance){
-			turret.set(speed);
-		} else if(error < -allowance){
-			turret.set(-speed);
-		}else {
-			turret.set(0);
+			speed = p*Math.log10(Math.abs(error));
+			if(error > allowance){
+				turret.set(speed);
+			} else if(error < -allowance){
+				turret.set(-speed);
+			}else {
+				turret.set(0);
+			}
 		}
-		
 		
 	}
 	
@@ -70,7 +83,7 @@ public class Turret {
 	}
 	
 	public void updateSmartDashboard(){
-		SmartDashboard.putBoolean("Turret Limit", limitSensor.get());
+		SmartDashboard.putNumber("Turret Current Draw", currentDraw());
 	}
 	
 	public void checkControls(){

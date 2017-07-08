@@ -173,7 +173,7 @@ public class VisionBoiler {
       		width2 = (char) 0;
       		height2 = (char) 0;
       	}
-      	// Find right most target
+      	// Find top most target
       	if(yPos1 > yPos2)
       	{
       		Target_X = xPos1;
