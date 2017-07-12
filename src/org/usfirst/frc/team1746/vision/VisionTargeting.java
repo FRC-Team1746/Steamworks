@@ -81,16 +81,4 @@ public class VisionTargeting {
 		errorB4.set(false);
 		
 	}
-	//Shooter Speed Calculation
-	double a = 1;
-	double b = 1;
-	double c = 1;
-	double d = 1;  
-	double h = m_vision_boiler.getHeight();
-  
-  	double speedFunction = -((a * Math.pow(h, 3)) + (b * Math.pow(h, 2)) + (c * h) + (d));//negative because forwards is backwards for shooter
-	
-	public double getSpeed(){
-		return speedFunction;
-	}
 }

@@ -45,8 +45,8 @@ public class Loader {
 		
 		if(r){
 			i++;
-			loader.set(.4);
-			if(i > 5){
+			loader.set(-.4);
+			if(i > 10){
 				i = 0;
 				r = false;
 			}
@@ -57,7 +57,7 @@ public class Loader {
 	}
 	
 	public double currentDraw(){
-		return pdp.getCurrent(7);
+		return pdp.getCurrent(6);
 	}
 	
 	public void test(){
@@ -66,7 +66,11 @@ public class Loader {
 	public void stop(){
 		loader.stopMotor();
 	}
-
+	
+	public void updateSmartDashboard(){
+		SmartDashboard.putNumber("Indexer Current Draw", currentDraw());
+	}
+	
 	public void checkControls(){
 		if(m_controls.operator_loader()){
 			set(1);

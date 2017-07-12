@@ -5,6 +5,7 @@ import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
 import org.usfirst.frc.team1746.robot.Loader;
 import org.usfirst.frc.team1746.robot.Shooter;
+import org.usfirst.frc.team1746.robot.subsystems.Turret;
 import org.usfirst.frc.team1746.vision.VisionBase;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -21,14 +22,16 @@ public class AutonBase {
 	private Shooter m_shooter;
 	private Conveyor m_conveyor;
 	private VisionBase m_vision;
+	private Turret m_turret;
 	
-	public AutonBase(Drivetrain drive, GearIntake gear, Loader loader, Shooter shooter, Conveyor conveyor, VisionBase vision){
+	public AutonBase(Drivetrain drive, GearIntake gear, Loader loader, Shooter shooter, Conveyor conveyor, VisionBase vision, Turret turret){
 		m_drive = drive;
 		m_gear = gear;
 		m_loader = loader;
 		m_shooter = shooter;
 		m_conveyor = conveyor;
 		m_vision = vision;
+		m_turret = turret;
 	}
 	
 	AutonConstants aConstants = new AutonConstants();
@@ -46,7 +49,7 @@ public class AutonBase {
 		gear_c = new GearCenter(m_drive, m_gear, m_loader, m_conveyor, m_shooter);
 		gear_r = new GearRight(m_drive, m_gear, m_loader, m_conveyor, m_shooter, m_vision);
 		forward = new Forward(m_drive);
-		hopper = new Hopper(m_drive, m_gear, m_shooter, m_conveyor, m_loader);
+		hopper = new Hopper(m_drive, m_gear, m_shooter, m_conveyor, m_loader, m_turret);
 		gear_l.init();
 		gear_c.init();
 		gear_r.init();

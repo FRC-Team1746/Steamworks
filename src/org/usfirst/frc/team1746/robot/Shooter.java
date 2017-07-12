@@ -95,18 +95,18 @@ public class Shooter {
 	}
 	
 	
-	double a = .8333333;
-	double b = -62.5;
-	double c = 1286.6666667;
-	double d = -10735;  
+	double a = -.001827753;
+	double b = .7434676106;
+	double c = -102.5691828;
+	double d = 2030.89167;  
 	double h = 0;
   
   	double speedFunction = 0;
 	
-	public double getSpeedFromCam(){
-		h = m_visionB.getHeight();
+	public void setSpeedFromCam(){
+		h = m_visionB.getTopObject();
 		speedFunction = (a * Math.pow(h, 3)) + (b * Math.pow(h, 2)) + (c * h) + (d);
-		return speedFunction;
+		speed = (int) speedFunction;
 	}
 	
 	
@@ -117,6 +117,7 @@ public class Shooter {
 	boolean speedUp;
 	boolean speedDown;
 	boolean speedSet;
+	boolean pixy = false;
 	public void checkControls(){
 		SmartDashboard.putNumber("Shooter Desired Speed", speed);
 		
@@ -153,8 +154,14 @@ public class Shooter {
 		} else {
 			stop();
 		}
-		if(m_controls.driver_SetSpeed()){
-			speed = (int) getSpeedFromCam();
+		if(m_controls.operator_pixyControlOn()){
+			pixy = true;
+		}
+		if(m_controls.operator_pixyControlOff()){
+			pixy = false;
+		}
+		if(pixy){
+			setSpeedFromCam();
 		}
 		
 	}

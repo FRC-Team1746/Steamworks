@@ -203,6 +203,7 @@ public class VisionBoiler {
     	SmartDashboard.putNumber("bTarget_Y", Target_Y);
     	SmartDashboard.putNumber("bTarget_W", Target_W);
     	SmartDashboard.putNumber("bTarget_H", Target_H);
+    	SmartDashboard.putNumber("bTarget_Top", getTopObject());
     	SmartDashboard.putNumber("bTarget_error", getError());
     	SmartDashboard.putNumber("bnumTargets: ", numTargets);
 
@@ -226,13 +227,16 @@ public class VisionBoiler {
     }
 
     public int getError(){
-    	return Target_X-Setpoint+35;
+    	return Target_X-Setpoint+50;
     }
     
     public double getHeight(){
     	return (double) Target_H;
     }
     
+    public double getTopObject(){
+    	return Target_Y+(Target_H/2);
+    }
     public boolean Tracking(){
     	return Tracking;
     }

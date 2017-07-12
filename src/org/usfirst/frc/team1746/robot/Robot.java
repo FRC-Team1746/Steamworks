@@ -43,7 +43,7 @@ public class Robot extends IterativeRobot {
 		loader = new Loader(controls);
 		shooter = new Shooter(controls, visionT, vision_boiler);
 		conveyor = new Conveyor(controls);
-		auton = new AutonBase(drive, gear, loader, shooter, conveyor, vision);
+		auton = new AutonBase(drive, gear, loader, shooter, conveyor, vision, turret);
 		rgb_leds = new RGB_LEDs(vision_boiler, gear);
 		
 		test = new DigitalOutput(11);
@@ -84,13 +84,27 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		auton.run();
 		vision.trackObject();
+		vision_boiler.trackObject();
 		rgb_leds.update();
 		updateSmartDashboard();
 		
 	}
 
+	boolean first;
+	int i;
+	@Override
+	public void teleopInit(){
+		first = true;
+		i = 0;
+	}
 	@Override
 	public void teleopPeriodic() {
+		if(first){
+			gear.flapsOut();
+			i++;
+			if(i>50)
+			first = false;
+		}
 		updateSmartDashboard();
 		
 		vision.trackObject();
@@ -137,6 +151,7 @@ public class Robot extends IterativeRobot {
 		turret.updateSmartDashboard();
 		vision.updateSmartdashboard();
 		vision_boiler.updateSmartdashboard();
+		loader.updateSmartDashboard();
 	}
 }
 

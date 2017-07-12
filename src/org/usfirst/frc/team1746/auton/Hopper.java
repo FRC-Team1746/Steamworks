@@ -5,6 +5,7 @@ import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
 import org.usfirst.frc.team1746.robot.Loader;
 import org.usfirst.frc.team1746.robot.Shooter;
+import org.usfirst.frc.team1746.robot.subsystems.Turret;
 
 public class Hopper {
 
@@ -15,13 +16,15 @@ public class Hopper {
 	Shooter m_shooter;
 	Conveyor m_conveyor;
 	Loader m_loader;
+	Turret m_turret;
 	
-	public Hopper(Drivetrain drive, GearIntake gear, Shooter shooter, Conveyor conveyor, Loader loader){
+	public Hopper(Drivetrain drive, GearIntake gear, Shooter shooter, Conveyor conveyor, Loader loader, Turret turret){
 		m_drive = drive;
 		m_gear = gear;
 		m_shooter = shooter;
 		m_conveyor = conveyor;
 		m_loader = loader;
+		m_turret = turret;
 	}
 	
 	public void reset(){
@@ -33,6 +36,7 @@ public class Hopper {
 		DRIVE_A,
 		CURVE,
 		DRIVE_B,
+		TRACK,
 		SHOOT,
 		WAIT_TELEOP
 	}
@@ -46,6 +50,8 @@ public class Hopper {
 	public void init(){
 		currentState = States.INIT;
 	}
+	
+	int i=0;
 	
 	public void auton(String alliance){
 		switch(currentState){
@@ -107,9 +113,24 @@ public class Hopper {
 			
 			if(m_drive.avgEncoderTicks() > 15){
 				m_drive.resetEncoders();
-				currentState = States.SHOOT;
+				i=0;
+				currentState = States.TRACK;
 			}
-			break;
+		break;
+		case TRACK:
+			i++;
+			
+			if(alliance.equalsIgnoreCase("blue")) m_shooter.setRPM(aConstants.H_RPM_BLUE);
+			if(alliance.equalsIgnoreCase("red"))  m_shooter.setRPM(aConstants.H_RPM_RED);
+			if(i>50){
+				m_drive.straight(-.25);
+				//m_turret.track();
+				if(i>100){
+					currentState = States.SHOOT;
+				}
+			}
+			
+		break;
 		case SHOOT:
 			m_drive.straight(-.25);
 			if(alliance.equalsIgnoreCase("blue")) m_shooter.setRPM(aConstants.H_RPM_BLUE);
