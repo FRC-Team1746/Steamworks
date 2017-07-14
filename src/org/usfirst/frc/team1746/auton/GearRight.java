@@ -74,8 +74,8 @@ public class GearRight {
 		case SHOOT_INIT:
 			loops++;
 			m_conveyor.set(-1);
-			m_shooter.setRPM(aConstants.R_RPM_RED);
-			if(loops > 75){
+			m_shooter.setRPM(aConstants.R_RPM_RED);			
+			if(m_shooter.getSpeed() < -2700){
 				loops = 0;
 				currentState = States.SHOOT;
 			}

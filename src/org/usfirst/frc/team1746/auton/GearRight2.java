@@ -1,10 +1,14 @@
 package org.usfirst.frc.team1746.auton;
 
+
 import org.usfirst.frc.team1746.robot.Conveyor;
 import org.usfirst.frc.team1746.robot.Drivetrain;
 import org.usfirst.frc.team1746.robot.GearIntake;
 import org.usfirst.frc.team1746.robot.Loader;
 import org.usfirst.frc.team1746.robot.Shooter;
+
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class GearRight2 {
 	AutonConstants aConstants = new AutonConstants();
@@ -16,7 +20,7 @@ public class GearRight2 {
 	private Loader m_loader;
 	private Conveyor m_conveyor;
 	private Shooter m_shooter;
-	
+	Timer timer;
 	public GearRight2(Drivetrain drive, GearIntake gear, Loader loader, Conveyor conveyor, Shooter shooter) {
 		m_drive = drive;
 		m_gear = gear;
@@ -54,6 +58,8 @@ public class GearRight2 {
 		loops = 0;
 	}
 	public void init(){
+		timer = new Timer();
+		timer.reset();
 		reset();
 	}
 
@@ -70,7 +76,10 @@ public class GearRight2 {
 		case SHOOT_INIT:
 			loops++;
 			m_conveyor.set(-.5);
+			timer.start();
 			m_shooter.setRPM(-3050);
+			if(m_shooter.getSpeed() > 2600) timer.stop();
+			SmartDashboard.putNumber("Timer", timer.get());
 			if(loops > 75){
 				loops = 0;
 				currentState = States.SHOOT;
@@ -80,6 +89,8 @@ public class GearRight2 {
 		case SHOOT:
 			loops++;
 			m_loader.set(1);
+			SmartDashboard.putNumber("Timer", timer.get());
+			if(m_shooter.getSpeed() > 2600) timer.stop();
 			if(loops > 250){
 				m_loader.set(0);
 				m_conveyor.set(0);
