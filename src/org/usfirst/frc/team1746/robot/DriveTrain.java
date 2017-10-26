@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain {
@@ -27,6 +28,8 @@ public class Drivetrain {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///// Drivetrain init
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	SendableChooser<String> driveSelector = new SendableChooser<>();
 	
 	Victor leftFront;
 	Victor leftBack;
@@ -62,6 +65,10 @@ public class Drivetrain {
 	
 	public void teleopArcadeDrive(){
 		myRobot.arcadeDrive(m_controls.xbox_driver);
+	}
+	
+	public void teleopFPSDrive(){
+		myRobot.arcadeDrive(m_controls.xbox_driver, m_controls.driver_leftAxis(), m_controls.xbox_driver, m_controls.driver_rightAxis());
 	}	
 	
 	public void teleopTankDrive(){
@@ -100,10 +107,22 @@ public class Drivetrain {
 		gyro.calibrate();
 	}
 	public void initSmartDashboard(){
+		initDriveSelector();
 		SmartDashboard.putBoolean("Reset Encoders", false);
 		SmartDashboard.putBoolean("Calibrate Gyro", false);
 		
 	}
+	private void initDriveSelector() {
+		driveSelector.addDefault("Arcade Drive", "arc");
+		driveSelector.addObject("FPS Drive", "fps");
+		driveSelector.addObject("Tank Drive", "tnk");
+		SmartDashboard.putData("Drive Selector", driveSelector);
+	}
+	
+	public String selectedDrive(){
+		return driveSelector.getSelected();
+	}
+
 	public void updateSmartDashboard(){
 		if(SmartDashboard.getBoolean("Reset Encoders", false)){
 			resetEncoders();
@@ -116,6 +135,7 @@ public class Drivetrain {
 		SmartDashboard.putNumber("Left Encoder", leftEncoderTicks());
 		SmartDashboard.putNumber("Right Encoder", rightEncoderTicks());
 		SmartDashboard.putNumber("Gyro Angle", gyroAngle());
+		SmartDashboard.putString("Selected Drive", selectedDrive());
 	}
 	public void straight(double speed){
 		myRobot.setLeftRightMotorOutputs(speed, speed);

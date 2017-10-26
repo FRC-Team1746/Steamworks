@@ -110,7 +110,13 @@ public class Robot extends IterativeRobot {
 		vision.trackObject();
 		vision_boiler.trackObject();
 		
-		drive.teleopArcadeDrive();
+		if(drive.selectedDrive().equalsIgnoreCase("arc")){
+			drive.teleopArcadeDrive();
+		}else if(drive.selectedDrive().equalsIgnoreCase("fps")){
+			drive.teleopFPSDrive();
+		}else if(drive.selectedDrive().equalsIgnoreCase("tnk")){
+			drive.teleopTankDrive();
+		}
 		
 		climber.checkControls();
 		
