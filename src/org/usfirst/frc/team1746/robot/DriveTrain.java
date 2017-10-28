@@ -68,7 +68,7 @@ public class Drivetrain {
 	}
 	
 	public void teleopFPSDrive(){
-		myRobot.arcadeDrive(m_controls.xbox_driver, m_controls.driver_leftAxis(), m_controls.xbox_driver, m_controls.driver_rightAxis());
+		myRobot.arcadeDrive(m_controls.xbox_driver, m_controls.driver_leftAxis(), m_controls.xbox_driver, m_controls.driver_rightXAxis());
 	}	
 	
 	public void teleopTankDrive(){

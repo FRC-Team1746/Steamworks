@@ -89,6 +89,9 @@ public class Controls {
 	public int driver_rightAxis(){
 		return 5;
 	}
+	public int driver_rightXAxis(){
+		return 4;
+	}
 	// Rotate to Set Degree
 	public boolean driver_allign(int degree){
 		return xbox_driver.getPOV() == degree;
